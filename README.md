@@ -72,10 +72,13 @@ To call TypeSafe directly instead of OpenCode, set the endpoint to
 
 ### Get an OpenCode API key
 
-1. Sign in at <https://opencode.ai/auth>.
-2. In your workspace, open **API Keys** and create a key, for example `cc-mod-auto-effort`.
-3. Export it as `OPENCODE_API_KEY` in the shell that starts Claude Code, or put it in a
-   gitignored `.env` for `pnpm eval`.
+1. Sign in at <https://opencode.ai/auth> and open your workspace.
+2. Open **Keys**, which lists service accounts, and click **Add Service Account**. Name it,
+   for example `cc-mod-auto-effort`.
+3. On the service account, click **Add API Key** and set **Permissions** to
+   **Inference only**. The expiry date is optional.
+4. Copy the key, since it is shown once. Export it as `OPENCODE_API_KEY` in the shell
+   that starts Claude Code, or put it in the gitignored `.env` that `pnpm eval` reads.
 
 ## Commands
 
@@ -97,6 +100,11 @@ pnpm test        # claude plugin test: hooks with stubbed Jev, no network
 pnpm validate    # claude plugin validate --strict
 pnpm eval        # sample prompts against the live endpoint (needs OPENCODE_API_KEY)
 ```
+
+On 2026-10-02, `pnpm eval` against `jev-1.13` on OpenCode matched the expected level on
+6 of the 9 sample prompts. The other 3 were off by one level. Each call took 0.4–1 s,
+and the whole run used about 6k input tokens (about $0.0003). `jev-1.13-free` returned
+`429 FreeUsageLimitError` at the time.
 
 `claude --plugin-dir . --debug-file /tmp/cc.log` logs each override as
 `[auto-effort] … effort low → high`.

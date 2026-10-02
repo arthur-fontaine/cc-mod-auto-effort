@@ -50,7 +50,7 @@ the mod for one repository only, add this to that repository's
 
 ```json
 {
-  "env": { "OPENCODE_API_KEY": "oc_…" },
+  "env": { "AUTO_EFFORT_API_KEY": "oc_…" },
   "extraKnownMarketplaces": {
     "auto-effort-dev": { "source": { "source": "directory", "path": "/path/to/cc-mod-auto-effort" } }
   },
@@ -68,7 +68,7 @@ The endpoint, key, and model are configurable. Each value is read from the plugi
 
 | userConfig | Environment | Default |
 | :- | :- | :- |
-| `api_key` (stored in the OS keychain) | `AUTO_EFFORT_API_KEY`, then `OPENCODE_API_KEY` | none: the mod does nothing |
+| `api_key` (stored in the OS keychain) | `AUTO_EFFORT_API_KEY` | none: the mod does nothing |
 | `endpoint` | `AUTO_EFFORT_ENDPOINT` | `https://opencode.ai/zen/v1/systemone` |
 | `model` | `AUTO_EFFORT_MODEL` | `jev-1.13` (`jev-1.13-free` while OpenCode offers it) |
 | `min_confidence` | `AUTO_EFFORT_MIN_CONFIDENCE` | `0.5` |
@@ -94,7 +94,7 @@ To call TypeSafe directly instead of OpenCode, set the endpoint to
    for example `cc-mod-auto-effort`.
 3. On the service account, click **Add API Key** and set **Permissions** to
    **Inference only**. The expiry date is optional.
-4. Copy the key, since it is shown once. Export it as `OPENCODE_API_KEY` in the shell
+4. Copy the key, since it is shown once. Export it as `AUTO_EFFORT_API_KEY` in the shell
    that starts Claude Code, or put it in the gitignored `.env` that `pnpm eval` reads.
 
 ## Commands
@@ -115,7 +115,7 @@ used for training.
 ```sh
 pnpm test        # claude plugin test: hooks with stubbed Jev, no network
 pnpm validate    # claude plugin validate --strict
-pnpm eval        # sample prompts against the live endpoint (needs OPENCODE_API_KEY)
+pnpm eval        # sample prompts against the live endpoint (needs AUTO_EFFORT_API_KEY)
 ```
 
 On 2026-10-02, `pnpm eval` against `jev-1.13` on OpenCode matched the expected level on

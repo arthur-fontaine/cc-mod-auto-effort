@@ -1,6 +1,6 @@
 // Sends sample prompts to the configured Jev endpoint with the mod's own
 // question and prints what the mod would decide. Reads the same environment
-// variables as the mod (OPENCODE_API_KEY, AUTO_EFFORT_*), and a .env file.
+// variables as the mod (AUTO_EFFORT_*), and a .env file.
 import { readFileSync } from 'node:fs'
 import { buildRequest, decide, describe, resolveConfig } from '../hooks/policy.js'
 
@@ -15,7 +15,7 @@ try {
 
 const env = process.env
 const config = resolveConfig({}, {
-  apiKey: env.AUTO_EFFORT_API_KEY ?? env.OPENCODE_API_KEY,
+  apiKey: env.AUTO_EFFORT_API_KEY,
   endpoint: env.AUTO_EFFORT_ENDPOINT,
   model: env.AUTO_EFFORT_MODEL,
   minConfidence: env.AUTO_EFFORT_MIN_CONFIDENCE,
@@ -23,7 +23,7 @@ const config = resolveConfig({}, {
   maxEffort: env.AUTO_EFFORT_MAX_EFFORT,
 })
 if (!config.apiKey) {
-  console.error('Set OPENCODE_API_KEY (or AUTO_EFFORT_API_KEY), in the environment or in .env')
+  console.error('Set AUTO_EFFORT_API_KEY, in the environment or in .env')
   process.exit(1)
 }
 

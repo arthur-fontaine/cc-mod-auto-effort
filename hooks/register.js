@@ -12,7 +12,7 @@ let warnedNoKey = false
 
 async function loadConfig($, options) {
   const env = {
-    apiKey: (await $.env.get('AUTO_EFFORT_API_KEY')) ?? (await $.env.get('OPENCODE_API_KEY')),
+    apiKey: await $.env.get('AUTO_EFFORT_API_KEY'),
     endpoint: await $.env.get('AUTO_EFFORT_ENDPOINT'),
     model: await $.env.get('AUTO_EFFORT_MODEL'),
     minConfidence: await $.env.get('AUTO_EFFORT_MIN_CONFIDENCE'),
@@ -55,7 +55,7 @@ async function classify($, options, prompt) {
   if (!config.apiKey) {
     if (!warnedNoKey) {
       warnedNoKey = true
-      $.ui.status('auto-effort: no API key (set api_key or OPENCODE_API_KEY)')
+      $.ui.status('auto-effort: no API key (set api_key or AUTO_EFFORT_API_KEY)')
     }
     return null
   }

@@ -19,7 +19,7 @@ type Setup = {
 }
 
 // Stubs everything the mod reaches, and records what the model request carried.
-function stub(on: any, { env = { OPENCODE_API_KEY: 'test-key' }, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
+function stub(on: any, { env = { AUTO_EFFORT_API_KEY: 'test-key' }, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
   const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[] }
   if (clock) mock.clock(on)
   mock.env(on, env)
@@ -134,6 +134,12 @@ test('without an API key Jev is not called', async ($, on) => {
   await runTurn($, 'Refactor the parser')
   expect(seen.requests.length).toBe(0)
   expect(seen.efforts).toEqual(['medium'])
+})
+
+test('OPENCODE_API_KEY alone is not used', async ($, on) => {
+  const seen = stub(on, { env: { OPENCODE_API_KEY: 'test-key' } })
+  await runTurn($, 'Refactor the parser')
+  expect(seen.requests.length).toBe(0)
 })
 
 test("a subagent's requests keep their own effort", async ($, on) => {

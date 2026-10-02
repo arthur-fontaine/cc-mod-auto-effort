@@ -44,6 +44,23 @@ claude --plugin-dir /path/to/cc-mod-auto-effort
 To load it in every session, add the directory to `CLAUDE_CODE_PLUGIN_DIRS` in the `env`
 block of `~/.claude/settings.json`.
 
+The repository is also its own marketplace (`.claude-plugin/marketplace.json`). To enable
+the mod for one repository only, add this to that repository's
+`.claude/settings.local.json`. Project settings can't set `CLAUDE_CODE_PLUGIN_DIRS`.
+
+```json
+{
+  "env": { "OPENCODE_API_KEY": "oc_…" },
+  "extraKnownMarketplaces": {
+    "auto-effort-dev": { "source": { "source": "directory", "path": "/path/to/cc-mod-auto-effort" } }
+  },
+  "enabledPlugins": { "auto-effort@auto-effort-dev": true }
+}
+```
+
+A `directory` marketplace loads the plugin in place, so edits apply after
+`/reload-plugins` or in the next session.
+
 ## Configure
 
 The endpoint, key, and model are configurable. Each value is read from the plugin's

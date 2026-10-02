@@ -1,0 +1,14 @@
+{
+  "name": "auto-effort-dev",
+  "owner": {
+    "name": "Arthur Fontaine"
+  },
+  "description": "Development marketplace for the auto-effort mod",
+  "plugins": [
+    {
+      "name": "auto-effort",
+      "source": "./",
+      "description": "Lets Jev pick Claude's effort level for each prompt"
+    }
+  ]
+}

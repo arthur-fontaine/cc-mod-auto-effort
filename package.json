@@ -1,0 +1,10 @@
+{
+  "name": "auto-effort",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "claude plugin test",
+    "validate": "claude plugin validate . --strict",
+    "eval": "node scripts/eval-jev.mjs"
+  }
+}

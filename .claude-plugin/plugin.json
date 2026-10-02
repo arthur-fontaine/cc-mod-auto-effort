@@ -1,0 +1,57 @@
+{
+  "name": "auto-effort",
+  "displayName": "Auto Effort",
+  "version": "0.1.0",
+  "description": "Lets Jev, a System One model, pick Claude's effort level for each prompt",
+  "author": { "name": "Arthur Fontaine" },
+  "repository": "https://github.com/arthur-fontaine/cc-mod-auto-effort",
+  "license": "MIT",
+  "keywords": ["effort", "jev", "opencode", "mod"],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Jev API key",
+      "description": "Bearer key for the Jev endpoint, such as an OpenCode Zen key. Falls back to AUTO_EFFORT_API_KEY, then OPENCODE_API_KEY.",
+      "sensitive": true
+    },
+    "endpoint": {
+      "type": "string",
+      "title": "Jev endpoint",
+      "description": "System One endpoint URL. Falls back to AUTO_EFFORT_ENDPOINT, then https://opencode.ai/zen/v1/systemone."
+    },
+    "model": {
+      "type": "string",
+      "title": "Jev model",
+      "description": "Model sent to the endpoint, such as jev-1.13 or jev-1.13-free. Falls back to AUTO_EFFORT_MODEL, then jev-1.13."
+    },
+    "min_confidence": {
+      "type": "number",
+      "title": "Minimum confidence",
+      "description": "Below this Jev confidence (0 to 1) the session's own effort stands. Defaults to 0.5.",
+      "min": 0,
+      "max": 1
+    },
+    "timeout_ms": {
+      "type": "number",
+      "title": "Timeout (ms)",
+      "description": "How long to wait for Jev before keeping the session's own effort. Defaults to 4000.",
+      "min": 100,
+      "max": 9000
+    },
+    "min_effort": {
+      "type": "string",
+      "title": "Lowest effort",
+      "description": "Lowest level the mod may pick: low, medium, high, xhigh, or max. Defaults to low."
+    },
+    "max_effort": {
+      "type": "string",
+      "title": "Highest effort",
+      "description": "Highest level the mod may pick: low, medium, high, xhigh, or max. Defaults to xhigh."
+    },
+    "include_context": {
+      "type": "boolean",
+      "title": "Send Claude's last reply",
+      "description": "Also send Claude's previous reply (truncated) to Jev so follow-ups like 'yes, do it' are classified correctly. Defaults to true."
+    }
+  }
+}

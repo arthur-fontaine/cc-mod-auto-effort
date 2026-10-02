@@ -14,10 +14,12 @@ function jevReply({ choice, confidence }: Answer) {
 type Setup = {
   env?: Record<string, string>
   fetch?: (e: { url: string; init?: { headers?: Record<string, string>; body?: string } }) => unknown
+  // What Claude Code answers for prompt.submit; by default the prompt enters
+  submit?: (e: { text: string }) => unknown
 }
 
 // Stubs everything the mod reaches, and records what the model request carried.
-function stub(on: any, { env = { OPENCODE_API_KEY: 'test-key' }, fetch, clock = true }: Setup & { clock?: boolean }) {
+function stub(on: any, { env = { OPENCODE_API_KEY: 'test-key' }, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
   const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[] }
   if (clock) mock.clock(on)
   mock.env(on, env)
@@ -32,7 +34,7 @@ function stub(on: any, { env = { OPENCODE_API_KEY: 'test-key' }, fetch, clock = 
     seen.requests.push({ url: e.url, headers: e.init?.headers, body: JSON.parse(e.init?.body ?? '{}') })
     return fetch ? fetch(e) : { value: jevReply({ choice: 'high', confidence: 0.9 }) }
   })
-  on('prompt.submit', ($: any, e: any) => ({ text: e.text }))
+  on('prompt.submit', ($: any, e: any) => (submit ? submit(e) : { text: e.text }))
   on('turn.start', ($: any, e: any) => ({ turnId: e.turnId }))
   on('turn.complete', () => ({ text: '' }))
   on('turn.step', async function* ($: any, e: any) {
@@ -153,6 +155,34 @@ test('the decision does not leak into the next turn', async ($, on) => {
   await $.turn.start({ text: '', turnId: 't2' })
   await step($, { turnId: 't2' })
   expect(seen.efforts).toEqual(['high', 'medium'])
+})
+
+test('a prompt typed during a turn applies to its own turn, not the running one', async ($, on) => {
+  const seen = stub(on, { fetch: () => ({ value: jevReply({ choice: 'xhigh', confidence: 0.9 }) }) })
+  await $.turn.start({ text: '', turnId: 't1' })
+  await $.prompt.submit({ text: 'Then audit the auth module', wait: false, origin: { kind: 'composer' }, turnId: 't1' })
+  await step($, {})
+  await $.turn.complete({ turnId: 't1', answer: 'done', durationMs: 10, isAborted: false, usage: null })
+  await $.turn.start({ text: 'Then audit the auth module', turnId: 't2' })
+  await step($, { turnId: 't2' })
+  expect(seen.efforts).toEqual(['medium', 'xhigh'])
+})
+
+test('a message delivered into a running turn is not classified', async ($, on) => {
+  const seen = stub(on, {})
+  await runTurn($, 'Fix the flaky test')
+  await $.prompt.submit({ text: 'Status? One line.', wait: false, origin: { kind: 'peer' }, turnId: 't1' })
+  await step($, {})
+  expect(seen.requests.length).toBe(1)
+  expect(seen.efforts).toEqual(['high', 'high'])
+})
+
+test("a dropped prompt's decision does not reach the next turn", async ($, on) => {
+  const seen = stub(on, { submit: () => ({ drop: 'blocked by another mod' }) })
+  await $.prompt.submit({ text: 'Migrate the build to Vite', wait: false, origin: { kind: 'composer' } })
+  await $.turn.start({ text: '', turnId: 't1' })
+  await step($, {})
+  expect(seen.efforts).toEqual(['medium'])
 })
 
 test('/auto-effort off stops the overrides', async ($, on) => {

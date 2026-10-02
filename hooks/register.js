@@ -1,5 +1,7 @@
 import { buildRequest, decide, describe, LEVELS, resolveConfig } from './policy.js'
 
+const USER_ORIGINS = ['composer', 'bridge', 'sdk']
+
 // Decision for the prompt whose turn hasn't started yet.
 let pending = null
 // turnId -> decision, for turns in flight.
@@ -88,16 +90,21 @@ export function register(on, options) {
   })
 
   on('prompt.submit', async ($, e, next) => {
-    if (!enabled || !e.text.trim()) return next(e)
+    // A delivery into a running turn (a peer's message, a notification) isn't a
+    // new request from the user, so the running turn keeps its decision. Prompts
+    // the user types mid-turn are queued and get a turn of their own.
+    const intoRunningTurn = e.turnId && !USER_ORIGINS.includes(e.origin?.kind)
+    if (!enabled || intoRunningTurn || !e.text.trim()) return next(e)
     const decision = await classify($, options, e.text)
     if (decision) {
       lastDecision = decision
       $.ui.status(describe(decision))
-      // A prompt typed into a running turn steers that turn.
-      if (e.turnId) decisions.set(e.turnId, decision)
-      else pending = decision
+      pending = decision
     }
-    return next(e)
+    const result = await next(e)
+    // A later hook dropped the prompt: don't let its decision reach another turn.
+    if (result.drop) pending = null
+    return result
   })
 
   on('turn.start', async ($, e, next) => {

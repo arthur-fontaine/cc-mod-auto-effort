@@ -30,6 +30,8 @@ it should change only for a clear reason. The mod follows that:
    `max` pick never happens unless you allow it.
 
 The status line under the prompt shows the last decision, for example `effort high · 82%`.
+Each prompt waits for Jev before its turn starts. That is usually well under a second,
+and never longer than `timeout_ms`.
 
 ## Install
 
@@ -57,8 +59,13 @@ The endpoint, key, and model are configurable. Each value is read from the plugi
 | `min_effort` / `max_effort` | `AUTO_EFFORT_MIN_EFFORT` / `AUTO_EFFORT_MAX_EFFORT` | `low` / `xhigh` |
 | `include_context` | `AUTO_EFFORT_INCLUDE_CONTEXT` | `true` |
 
-For a mod loaded with `--plugin-dir`, non-sensitive values go under
-`pluginConfigs["auto-effort@inline"].options` in `~/.claude/settings.json`.
+For a mod loaded with `--plugin-dir`, values go under
+`pluginConfigs["auto-effort@inline"].options` in `~/.claude/settings.json`, or in a file
+passed with `--settings`. That path is tested, `api_key` included. The keychain path
+for `api_key`, used by an installed plugin's configuration dialog, hasn't been tested
+yet; the environment variables always work.
+
+Use an `https://` endpoint. The key is sent as a bearer token.
 
 To call TypeSafe directly instead of OpenCode, set the endpoint to
 `https://api.typesafe.ai/v1/systemone`, the model to `jev-latest`, and use a TypeSafe key.

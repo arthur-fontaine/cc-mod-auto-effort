@@ -17,7 +17,7 @@
     "endpoint": {
       "type": "string",
       "title": "Jev endpoint",
-      "description": "System One endpoint URL. Falls back to AUTO_EFFORT_ENDPOINT, then https://opencode.ai/zen/v1/systemone."
+      "description": "System One endpoint URL (use https: the key is sent as a bearer token). Falls back to AUTO_EFFORT_ENDPOINT, then https://opencode.ai/zen/v1/systemone."
     },
     "model": {
       "type": "string",

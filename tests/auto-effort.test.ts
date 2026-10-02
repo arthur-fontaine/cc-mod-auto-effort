@@ -18,8 +18,14 @@ type Setup = {
   submit?: (e: { text: string }) => unknown
 }
 
+const ENV = {
+  AUTO_EFFORT_ENDPOINT: 'https://jev.example/v1/systemone',
+  AUTO_EFFORT_API_KEY: 'test-key',
+  AUTO_EFFORT_MODEL: 'jev-test',
+}
+
 // Stubs everything the mod reaches, and records what the model request carried.
-function stub(on: any, { env = { AUTO_EFFORT_API_KEY: 'test-key' }, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
+function stub(on: any, { env = ENV, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
   const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[] }
   if (clock) mock.clock(on)
   mock.env(on, env)
@@ -66,12 +72,12 @@ test('a confident Jev answer sets the effort of the turn', async ($, on) => {
 
 test('the request goes to the configured endpoint with the key and model', async ($, on) => {
   const seen = stub(on, {
-    env: { AUTO_EFFORT_API_KEY: 'k-123', AUTO_EFFORT_ENDPOINT: 'https://jev.example/v1/systemone', AUTO_EFFORT_MODEL: 'jev-1.13-free' },
+    env: { AUTO_EFFORT_API_KEY: 'k-123', AUTO_EFFORT_ENDPOINT: 'https://other.example/v1/systemone', AUTO_EFFORT_MODEL: 'jev-1.13-free' },
   })
   await runTurn($, 'yes, do it')
   expect(seen.requests.length).toBe(1)
   const [req] = seen.requests
-  expect(req.url).toBe('https://jev.example/v1/systemone')
+  expect(req.url).toBe('https://other.example/v1/systemone')
   expect(req.headers.Authorization).toBe('Bearer k-123')
   expect(req.body.model).toBe('jev-1.13-free')
   expect(req.body.state.latest_user_message).toBe('yes, do it')
@@ -129,15 +135,23 @@ test('a slow Jev times out and keeps the session effort', async ($, on) => {
   expect(seen.efforts).toEqual(['medium'])
 })
 
-test('without an API key Jev is not called', async ($, on) => {
+test('with no environment Jev is not called, and the status names what to set', async ($, on) => {
   const seen = stub(on, { env: {} })
   await runTurn($, 'Refactor the parser')
   expect(seen.requests.length).toBe(0)
   expect(seen.efforts).toEqual(['medium'])
+  expect(seen.statuses).toContain('auto-effort: set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL')
 })
 
-test('OPENCODE_API_KEY alone is not used', async ($, on) => {
-  const seen = stub(on, { env: { OPENCODE_API_KEY: 'test-key' } })
+test('there is no default endpoint or model', async ($, on) => {
+  const seen = stub(on, { env: { AUTO_EFFORT_API_KEY: 'test-key' } })
+  await runTurn($, 'Refactor the parser')
+  expect(seen.requests.length).toBe(0)
+  expect(seen.statuses).toContain('auto-effort: set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_MODEL')
+})
+
+test('OPENCODE_API_KEY is not read', async ($, on) => {
+  const seen = stub(on, { env: { AUTO_EFFORT_ENDPOINT: ENV.AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_MODEL: 'jev-test', OPENCODE_API_KEY: 'test-key' } })
   await runTurn($, 'Refactor the parser')
   expect(seen.requests.length).toBe(0)
 })
@@ -203,6 +217,14 @@ test('/auto-effort off stops the overrides', async ($, on) => {
 test('/auto-effort status reports the configuration', async ($, on) => {
   stub(on, {})
   const reply = await $.command.run({ command: 'auto-effort', args: '' })
-  expect(reply.text).toMatch(/Endpoint: https:\/\/opencode\.ai\/zen\/v1\/systemone · model jev-1\.13/)
+  expect(reply.text).toMatch(/Endpoint: https:\/\/jev\.example\/v1\/systemone · model jev-test/)
   expect(reply.text).toMatch(/API key: set/)
+  expect(reply.text).not.toMatch(/Missing/)
+})
+
+test('/auto-effort status lists unset variables', async ($, on) => {
+  stub(on, { env: {} })
+  const reply = await $.command.run({ command: 'auto-effort', args: 'status' })
+  expect(reply.text).toMatch(/Endpoint: unset · model unset/)
+  expect(reply.text).toMatch(/Missing: AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL/)
 })

@@ -8,9 +8,9 @@ let pending = null
 const decisions = new Map()
 let enabled = true
 let lastDecision = null
-let warnedNoKey = false
+let warnedMissing = false
 
-async function loadConfig($, options) {
+async function loadConfig($) {
   const env = {
     apiKey: await $.env.get('AUTO_EFFORT_API_KEY'),
     endpoint: await $.env.get('AUTO_EFFORT_ENDPOINT'),
@@ -21,7 +21,7 @@ async function loadConfig($, options) {
     maxEffort: await $.env.get('AUTO_EFFORT_MAX_EFFORT'),
     includeContext: await $.env.get('AUTO_EFFORT_INCLUDE_CONTEXT'),
   }
-  return resolveConfig(options, env)
+  return resolveConfig(env)
 }
 
 async function previousReply($) {
@@ -50,12 +50,12 @@ async function askJev($, config, body) {
   return JSON.parse(response.text)
 }
 
-async function classify($, options, prompt) {
-  const config = await loadConfig($, options)
-  if (!config.apiKey) {
-    if (!warnedNoKey) {
-      warnedNoKey = true
-      $.ui.status('auto-effort: no API key (set api_key or AUTO_EFFORT_API_KEY)')
+async function classify($, prompt) {
+  const config = await loadConfig($)
+  if (config.missing.length) {
+    if (!warnedMissing) {
+      warnedMissing = true
+      $.ui.status('auto-effort: set ' + config.missing.join(', '))
     }
     return null
   }
@@ -68,7 +68,7 @@ async function classify($, options, prompt) {
   }
 }
 
-export function register(on, options) {
+export function register(on) {
   on('session.start', async ($, e, next) => {
     try {
       const saved = await $.store.get('enabled')
@@ -95,7 +95,7 @@ export function register(on, options) {
     // the user types mid-turn are queued and get a turn of their own.
     const intoRunningTurn = e.turnId && !USER_ORIGINS.includes(e.origin?.kind)
     if (!enabled || intoRunningTurn || !e.text.trim()) return next(e)
-    const decision = await classify($, options, e.text)
+    const decision = await classify($, e.text)
     if (decision) {
       lastDecision = decision
       $.ui.status(describe(decision))
@@ -144,12 +144,13 @@ export function register(on, options) {
       return { text: 'Jev effort picker turned ' + arg + '.' }
     }
     if (arg && arg !== 'status') return { text: 'Usage: /auto-effort [on|off|status]' }
-    const config = await loadConfig($, options)
+    const config = await loadConfig($)
     return {
       text: [
         'Jev effort picker: ' + (enabled ? 'on' : 'off'),
-        'Endpoint: ' + config.endpoint + ' · model ' + config.model,
-        'API key: ' + (config.apiKey ? 'set' : 'missing'),
+        'Endpoint: ' + (config.endpoint ?? 'unset') + ' · model ' + (config.model ?? 'unset'),
+        'API key: ' + (config.apiKey ? 'set' : 'unset'),
+        ...(config.missing.length ? ['Missing: ' + config.missing.join(', ')] : []),
         'Range: ' + config.minEffort + '–' + config.maxEffort + ' of ' + LEVELS.join(', ') +
           ' · min confidence ' + config.minConfidence,
         'Last decision: ' + (lastDecision ? describe(lastDecision) : 'none yet'),

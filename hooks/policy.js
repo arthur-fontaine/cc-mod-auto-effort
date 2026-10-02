@@ -3,8 +3,6 @@
 export const LEVELS = ['low', 'medium', 'high', 'xhigh', 'max']
 
 export const DEFAULTS = {
-  endpoint: 'https://opencode.ai/zen/v1/systemone',
-  model: 'jev-1.13',
   minConfidence: 0.5,
   timeoutMs: 4000,
   minEffort: 'low',
@@ -80,18 +78,30 @@ function toBool(value, fallback) {
   return fallback
 }
 
-// `options` are the userConfig values; `env` the environment fallbacks.
-export function resolveConfig(options = {}, env = {}) {
-  return {
-    apiKey: pick(options.api_key, env.apiKey),
-    endpoint: pick(options.endpoint, env.endpoint, DEFAULTS.endpoint),
-    model: pick(options.model, env.model, DEFAULTS.model),
-    minConfidence: toNumber(pick(options.min_confidence, env.minConfidence), DEFAULTS.minConfidence),
-    timeoutMs: toNumber(pick(options.timeout_ms, env.timeoutMs), DEFAULTS.timeoutMs),
-    minEffort: toLevel(pick(options.min_effort, env.minEffort), DEFAULTS.minEffort),
-    maxEffort: toLevel(pick(options.max_effort, env.maxEffort), DEFAULTS.maxEffort),
-    includeContext: toBool(pick(options.include_context, env.includeContext), DEFAULTS.includeContext),
+// The endpoint, key, and model have no default, so the mod never calls a
+// provider the user didn't choose.
+export const REQUIRED = {
+  endpoint: 'AUTO_EFFORT_ENDPOINT',
+  apiKey: 'AUTO_EFFORT_API_KEY',
+  model: 'AUTO_EFFORT_MODEL',
+}
+
+// `env` holds the AUTO_EFFORT_* values, keyed as in the returned config.
+export function resolveConfig(env = {}) {
+  const config = {
+    endpoint: pick(env.endpoint),
+    apiKey: pick(env.apiKey),
+    model: pick(env.model),
+    minConfidence: toNumber(pick(env.minConfidence), DEFAULTS.minConfidence),
+    timeoutMs: toNumber(pick(env.timeoutMs), DEFAULTS.timeoutMs),
+    minEffort: toLevel(pick(env.minEffort), DEFAULTS.minEffort),
+    maxEffort: toLevel(pick(env.maxEffort), DEFAULTS.maxEffort),
+    includeContext: toBool(pick(env.includeContext), DEFAULTS.includeContext),
   }
+  config.missing = Object.keys(REQUIRED)
+    .filter((key) => !config[key])
+    .map((key) => REQUIRED[key])
+  return config
 }
 
 export function buildRequest({ prompt, previousReply }, config) {

@@ -14,7 +14,7 @@ try {
 }
 
 const env = process.env
-const config = resolveConfig({}, {
+const config = resolveConfig({
   apiKey: env.AUTO_EFFORT_API_KEY,
   endpoint: env.AUTO_EFFORT_ENDPOINT,
   model: env.AUTO_EFFORT_MODEL,
@@ -22,8 +22,8 @@ const config = resolveConfig({}, {
   minEffort: env.AUTO_EFFORT_MIN_EFFORT,
   maxEffort: env.AUTO_EFFORT_MAX_EFFORT,
 })
-if (!config.apiKey) {
-  console.error('Set AUTO_EFFORT_API_KEY, in the environment or in .env')
+if (config.missing.length) {
+  console.error('Set ' + config.missing.join(', ') + ', in the environment or in .env')
   process.exit(1)
 }
 

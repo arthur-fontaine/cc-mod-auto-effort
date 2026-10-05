@@ -1,7 +1,7 @@
 {
   "name": "auto-effort",
   "displayName": "Auto Effort",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Picks Claude's effort level for each prompt with a System One decision model",
   "author": {
     "name": "Arthur Fontaine"

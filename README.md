@@ -55,18 +55,26 @@ once you trust the folder.
 
 ## Choose a provider
 
-Run `/auto-effort setup`. There's no default: the mod calls nothing until you pick one, and
-your choice is saved across sessions.
+The mod asks a decision model how much effort each prompt needs. Run `/auto-effort setup`
+to pick one; there's no default, so the mod calls nothing until you do. Your choice is saved
+across sessions.
 
-| Provider | Runs | Right level | Latency, median | You need |
+- **Nisev** is our own model, made for this one question: a Qwen3-1.7B fine-tuned on about
+  2,400 prompts from real coding-agent sessions, labeled by Claude. It runs on your machine
+  through llama.cpp, so prompts never leave it. See [how it was built](training/README.md).
+- **Jev** (by TypeSafe) and **Clef** (by Cloudflare) are general decision models, served in
+  the cloud. They answer the mod's question without training for it.
+
+| Model | Runs | Right level | Latency, median | You need |
 | :- | :- | -: | -: | :- |
-| [Nisev](https://huggingface.co/arthur-fontaine/nisev-1.7b-GGUF) | On your machine | 65.4% | 129 ms | llama.cpp, and a one-time 1.9 GB download |
-| Jev 1.13, on OpenCode Zen or TypeSafe | Cloud | 61.8% | 588 ms | An API key |
-| Clef-Flash or Clef, on Cloudflare Workers AI | Cloud | 56.6% / 51.5% | 309 / 495 ms | A Workers AI token |
+| Nisev 1.7B | On your machine | 65.4% | 129 ms | llama.cpp, and a one-time 1.9 GB download |
+| Jev 1.13 | Cloud: OpenCode Zen, TypeSafe, OpenRouter, Vercel AI Gateway | 61.8% | 588 ms | A key for one of them |
+| Clef-Flash 9B, Clef 27B | Cloud: Cloudflare Workers AI | 56.6%, 51.5% | 309, 495 ms | A Workers AI token |
 
-"Right level" is how often it picked the effort two Claude teachers agreed on, over 136
-real turns; always keeping the default gets 51.5%. Latency is from an M4 Pro. Details in
-the [benchmark](#benchmark).
+"Right level" is how often the model picked the effort that two Claude teachers agreed on,
+over 136 real turns; always keeping the default gets 51.5%. Latency is from an M4 Pro, with
+Jev measured through OpenCode Zen; other providers will differ. Details in the
+[benchmark](#benchmark).
 
 ### Nisev (local)
 
@@ -80,19 +88,23 @@ the [benchmark](#benchmark).
   2 GB of memory, and stops it with the session.
 - **Privacy**: nothing leaves your machine, apart from that one-time download.
 
-### A Jev endpoint
+### A cloud model (Jev, Clef)
 
-Choose **OpenCode Zen** or **TypeSafe**, or **Other** to type any System One URL and the
-model name it expects. Then set the key as `AUTO_EFFORT_API_KEY`
+Any provider that serves the System One API works. Setup has **OpenCode Zen** and
+**TypeSafe** built in; for the others, choose **Other** and enter the endpoint and model
+below. Then set the provider's key as `AUTO_EFFORT_API_KEY`
 ([where](#environment-variables)). The mod never stores it.
 
-| Provider | Endpoint | Model | Key |
-| :- | :- | :- | :- |
-| OpenCode Zen | `https://opencode.ai/zen/v1/systemone` | `jev-1.13` | An OpenCode API key (below) |
-| TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | From <https://console.typesafe.ai/keys> |
-| Cloudflare Workers AI | see below | `clef` or `clef-flash` | A token from the Workers AI template |
+| Provider | Endpoint | Model |
+| :- | :- | :- |
+| OpenCode Zen | `https://opencode.ai/zen/v1/systemone` | `jev-1.13` |
+| TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` |
+| OpenRouter | `https://openrouter.ai/api/v1/systemone` | `typesafe/jev-1.13` |
+| Vercel AI Gateway | `https://ai-gateway.vercel.sh/typesafe/v1/systemone` | `typesafe-ai/jev` |
+| Cloudflare Workers AI | see below | `clef` or `clef-flash` |
 
-For Cloudflare, choose **Other** with this URL, with `clef` or `clef-flash` at the end:
+For Cloudflare, use this URL, with `clef` or `clef-flash` at the end, and a token made from
+the Workers AI template:
 
 ```
 https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef
@@ -151,12 +163,12 @@ run `/reload-plugins`.
 
 | Variable | What it is |
 | :- | :- |
-| `AUTO_EFFORT_PROVIDER` | `nisev` or `jev`. Setting `AUTO_EFFORT_ENDPOINT` implies `jev`. |
+| `AUTO_EFFORT_PROVIDER` | `nisev`, or `jev` for any System One endpoint (Jev, Clef…). Setting `AUTO_EFFORT_ENDPOINT` implies `jev`. |
 | `AUTO_EFFORT_ENDPOINT` | The System One URL. Use `https://`: the key is sent as a bearer token. |
 | `AUTO_EFFORT_API_KEY` | The endpoint's key. Only ever read from the environment. |
 | `AUTO_EFFORT_MODEL` | The model name the endpoint expects. |
 
-While a Jev endpoint lacks one of these, the mod changes nothing, and the status line and
+While a cloud endpoint lacks one of these, the mod changes nothing, and the status line and
 `/auto-effort` say what's missing.
 
 **Nisev**
@@ -185,7 +197,7 @@ for a clear reason. For each prompt, the mod:
 1. **Asks the provider** about your prompt, Claude's previous reply (so "yes, do it" makes
    sense), and the session's model. Effort is calibrated per model: Opus 5.5 defaults to
    `medium`, most others to `high`.
-   - A Jev endpoint picks one of `low`, `medium`, `default`, `high`, `xhigh` and `max`,
+   - A cloud model picks one of `low`, `medium`, `default`, `high`, `xhigh` and `max`,
      each described with the blog post's rubric.
    - Nisev sorts the request into one of six kinds of task, from `trivial` to `exhaustive`.
      A table in [`hooks/policy.js`](hooks/policy.js) turns that into a level for the
@@ -201,7 +213,7 @@ It leaves the session's own effort alone when:
 - no provider is set up, the model takes no effort, or the request comes from a subagent.
 
 Each prompt waits for the answer before its turn starts: about 130 ms with Nisev on an M4
-Pro, 600 ms with Jev, and never more than `AUTO_EFFORT_TIMEOUT_MS`.
+Pro, 600 ms with Jev through OpenCode Zen, and never more than `AUTO_EFFORT_TIMEOUT_MS`.
 
 ## Benchmark
 
@@ -263,7 +275,7 @@ pnpm validate    # claude plugin validate --strict
 pnpm eval        # sample prompts against the live provider, reading .env
 ```
 
-- `pnpm eval` needs a Jev endpoint's three variables, in the environment or a gitignored
+- `pnpm eval` needs a cloud endpoint's three variables, in the environment or a gitignored
   `.env` (see `.env.example`), or `AUTO_EFFORT_PROVIDER=nisev` with Nisev already served.
   It reports the session model as `claude-opus-5-5`; set `AUTO_EFFORT_EVAL_CLAUDE_MODEL`
   to try another.

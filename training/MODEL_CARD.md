@@ -40,6 +40,11 @@ two Claude teachers (Sonnet 5.5 and Opus 5.5) agree after seeing what happened i
 turn. Always keeping the model's default scores 52.9%. Every model got the request the mod
 sends it, one request at a time; cloud latency includes the round trip from the Mac.
 
+![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](benchmark.svg)
+
+The green zone is where a picker should be: under 300 ms at the median, so the prompt
+doesn't visibly wait, and above 60%, clearly better than keeping the model's default.
+
 {{benchmark}}
 
 - **Right level**: how often the model picked the effort level the teachers chose, for

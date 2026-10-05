@@ -3,8 +3,8 @@
     uv run hf auth login     # once, with a token that can write
     uv run python pipeline/publish.py runs/qwen3-1.7b --repo arthur-fontaine/nisev-1.7b-GGUF
 
-The card is MODEL_CARD.md with the benchmark table from results/bench-*.json (run
-pipeline/benchmark.py first). Uploading again replaces both files; the Hub keeps history.
+The card is MODEL_CARD.md with the benchmark table from results/bench-*.json and the chart
+from docs/benchmark.svg (run pipeline/benchmark.py and pipeline/plot.py first). Uploading again replaces both files; the Hub keeps history.
 """
 import argparse
 import sys
@@ -37,6 +37,8 @@ def main():
     url = api.create_repo(args.repo, private=args.private, exist_ok=True)
     api.upload_file(path_or_fileobj=card.encode(), path_in_repo="README.md", repo_id=args.repo,
                     commit_message="Update the model card")
+    api.upload_file(path_or_fileobj=str(ROOT.parent / "docs" / "benchmark.svg"), path_in_repo="benchmark.svg",
+                    repo_id=args.repo, commit_message="Update the benchmark chart")
     if not args.card_only:
         api.upload_file(path_or_fileobj=str(gguf), path_in_repo=args.file, repo_id=args.repo,
                         commit_message=f"Upload {args.file}")

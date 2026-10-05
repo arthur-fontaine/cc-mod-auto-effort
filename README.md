@@ -192,6 +192,11 @@ includes the round trip from that Mac to the provider. Clef (27B) and Clef-Flash
 on Cloudflare Workers AI, since neither runs well on a 24 GB Mac: Clef-Flash in llama.cpp
 took 3.4 s per prompt at the median, at 4-bit.
 
+![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](docs/benchmark.svg)
+
+The green zone is where a picker should be: under 300 ms at the median, so the prompt
+doesn't visibly wait, and above 60%, clearly better than keeping the model's default.
+
 | Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | :- | :- | -: | -: | -: | -: |
 | **Nisev 1.7B** (this repo) | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `nisev-1.7b-Q8_0.gguf` (1.8 GB) | 65.4% | 73.5% | 66.9% | 129 / 364 ms |

@@ -59,6 +59,7 @@ uv run python pipeline/evaluate.py --model runs/qwen3-1.7b/fused-8bit --name qwe
 uv run --group merge python pipeline/export_gguf.py runs/qwen3-1.7b --llama-cpp ~/src/llama.cpp   # see Serve it
 uv run python pipeline/benchmark.py  # Nisev and Kev in llama.cpp; Jev, Clef, Clef-Flash in the cloud (keys: see the script)
 uv run python pipeline/report.py
+uv run python pipeline/plot.py       # docs/benchmark.svg, the README's chart
 uv run python pipeline/publish.py runs/qwen3-1.7b --repo arthur-fontaine/nisev-1.7b-GGUF   # after `uv run hf auth login`
 uv run python -m unittest discover -s tests
 ```

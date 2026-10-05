@@ -1,6 +1,6 @@
 # Nisev
 
-Nisev is a small Jev-like model that sizes each prompt for the auto-effort mod and runs on an Apple
+[Nisev](https://huggingface.co/arthur-fontaine/nisev-1.7b-GGUF) is a small Jev-like model that sizes each prompt for the auto-effort mod and runs on an Apple
 silicon Mac. It follows the recipe in Together's
 [How to train your own Jev for $17](https://x.com/nutlope/status/2102881280115249597)
 ([togethercomputer/tev1](https://github.com/togethercomputer/tev1)): a JSON decision task,

@@ -59,7 +59,7 @@ The mod asks a decision model how much effort each prompt needs. Run `/auto-effo
 to pick one; there's no default, so the mod calls nothing until you do. Your choice is saved
 across sessions.
 
-- **Nisev** is our own model, made for this one question: a Qwen3-1.7B fine-tuned on about
+- **[Nisev](https://huggingface.co/arthur-fontaine/nisev-1.7b-GGUF)** is our own model, made for this one question: a Qwen3-1.7B fine-tuned on about
   2,400 prompts from real coding-agent sessions, labeled by Claude. It runs on your machine
   through llama.cpp, so prompts never leave it. See [how it was built](training/README.md).
 - **Jev** (by TypeSafe) and **Clef** (by Cloudflare) are general decision models, served in
@@ -67,7 +67,7 @@ across sessions.
 
 | Model | Runs | Right level | Latency, median | You need |
 | :- | :- | -: | -: | :- |
-| Nisev 1.7B | On your machine | 65.4% | 129 ms | llama.cpp, and a one-time 1.9 GB download |
+| [Nisev 1.7B](https://huggingface.co/arthur-fontaine/nisev-1.7b-GGUF) | On your machine | 65.4% | 129 ms | llama.cpp, and a one-time 1.9 GB download |
 | Jev 1.13 | Cloud | 61.8% | 588 ms | An API key from a provider that serves it |
 | Clef-Flash 9B, Clef 27B | Cloud | 56.6%, 51.5% | 309, 495 ms | An API key from a provider that serves it |
 

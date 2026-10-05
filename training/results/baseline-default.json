@@ -5,99 +5,99 @@
  "category": {
   "n": 136,
   "accuracy": 0.3088235294117647,
-  "within_one": 0.75,
+  "within_one": 0.7573529411764706,
   "macro_f1": 0.0943820224719101,
   "confusion": {
    "trivial": {
     "ordinary": 21
    },
    "light": {
-    "ordinary": 30
+    "ordinary": 33
    },
    "ordinary": {
     "ordinary": 42
    },
    "multi_step": {
-    "ordinary": 30
+    "ordinary": 28
    },
    "hard": {
-    "ordinary": 13
+    "ordinary": 12
    }
   }
  },
  "level_actual_model": {
   "n": 136,
-  "accuracy": 0.5294117647058824,
+  "accuracy": 0.5147058823529411,
   "within_one": 0.8455882352941176,
-  "macro_f1": 0.17307692307692307,
+  "macro_f1": 0.16990291262135923,
   "confusion": {
    "low": {
     "high": 21
    },
    "medium": {
-    "high": 30
+    "high": 33
    },
    "high": {
-    "high": 72
+    "high": 70
    },
    "xhigh": {
-    "high": 13
+    "high": 12
    }
   },
-  "direction_accuracy": 0.5294117647058824,
+  "direction_accuracy": 0.5147058823529411,
   "moves": 0.0,
   "move_precision": null,
-  "applied_accuracy": 0.5294117647058824,
+  "applied_accuracy": 0.5147058823529411,
   "applied_within_one": 0.8455882352941176
  },
  "level_as_claude-opus-5-5": {
   "n": 136,
-  "accuracy": 0.5294117647058824,
-  "within_one": 0.9044117647058824,
-  "macro_f1": 0.17307692307692307,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9117647058823529,
+  "macro_f1": 0.17772511848341233,
   "confusion": {
    "low": {
     "medium": 21
    },
    "medium": {
-    "medium": 72
+    "medium": 75
    },
    "high": {
-    "medium": 30
+    "medium": 28
    },
    "xhigh": {
-    "medium": 13
+    "medium": 12
    }
   },
-  "direction_accuracy": 0.5294117647058824,
+  "direction_accuracy": 0.5514705882352942,
   "moves": 0.0,
   "move_precision": null,
-  "applied_accuracy": 0.5294117647058824,
-  "applied_within_one": 0.9044117647058824
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9117647058823529
  },
  "level_as_claude-sonnet-5-5": {
   "n": 136,
-  "accuracy": 0.5294117647058824,
+  "accuracy": 0.5147058823529411,
   "within_one": 0.8455882352941176,
-  "macro_f1": 0.17307692307692307,
+  "macro_f1": 0.16990291262135923,
   "confusion": {
    "low": {
     "high": 21
    },
    "medium": {
-    "high": 30
+    "high": 33
    },
    "high": {
-    "high": 72
+    "high": 70
    },
    "xhigh": {
-    "high": 13
+    "high": 12
    }
   },
-  "direction_accuracy": 0.5294117647058824,
+  "direction_accuracy": 0.5147058823529411,
   "moves": 0.0,
   "move_precision": null,
-  "applied_accuracy": 0.5294117647058824,
+  "applied_accuracy": 0.5147058823529411,
   "applied_within_one": 0.8455882352941176
  }
 }

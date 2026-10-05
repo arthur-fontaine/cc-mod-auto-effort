@@ -17,9 +17,25 @@ LEFT, RIGHT, TOP, BOTTOM = 72, 28, 56, 64
 X_MIN, X_MAX = 100, 4000  # ms, log scale
 Y_MIN, Y_MAX = 40, 80  # % right level
 # The zone to aim for: under the Doherty threshold (people stay engaged when a system answers
-# within 400 ms; Doherty and Thadani, IBM, 1982), and clearly above keeping the default.
-GOAL_MS, GOAL_PCT = 400, 60
-DEFAULT_PCT = 52.9
+# within 400 ms; Doherty and Thadani, IBM, 1982), and above the lowest score that beats always
+# keeping the default by more than chance on these turns (goal_pct).
+GOAL_MS = 400
+
+
+def default_baseline():
+    r = json.loads((ROOT / "results" / "baseline-default.json").read_text())
+    return r["n"], r["level_actual_model"]["accuracy"]
+
+
+def goal_pct(alpha=0.05):
+    """The smallest right-level share that a one-sided exact binomial test puts above the default."""
+    n, p0 = default_baseline()
+    tail = lambda k: sum(math.comb(n, i) * p0**i * (1 - p0) ** (n - i) for i in range(k, n + 1))
+    return 100 * next(k for k in range(n + 1) if tail(k) < alpha) / n
+
+
+DEFAULT_PCT = 100 * default_baseline()[1]
+GOAL_PCT = goal_pct()
 
 
 def x(ms):
@@ -66,6 +82,8 @@ def svg():
     out.append(f'<text x="{LEFT + 10}" y="{TOP + 20}" class="goal" style="font-weight: 600">Where we want to be</text>')
     out.append(f'<text x="{LEFT + 10}" y="{TOP + 37}" class="goal" style="font-size: 12px">fast and accurate</text>')
     out.append(f'<text x="{gx - 6:.1f}" y="{gy - 8:.1f}" class="goal" text-anchor="end" style="font-size: 11px">'
+               f'≥ {GOAL_PCT:.1f}%: beats the default, p &lt; 0.05</text>')
+    out.append(f'<text transform="translate({gx - 18:.1f} {TOP + 8}) rotate(90)" class="goal" style="font-size: 11px">'
                f'Doherty threshold, {GOAL_MS} ms</text>')
 
     for ms in (100, 200, 500, 1000, 2000):
@@ -79,7 +97,7 @@ def svg():
     out.append(f'<line x1="{LEFT}" x2="{W - RIGHT}" y1="{y(DEFAULT_PCT):.1f}" y2="{y(DEFAULT_PCT):.1f}" '
                'class="default" stroke-dasharray="6 4"/>')
     out.append(f'<text class="muted" x="{W - RIGHT - 6}" y="{y(DEFAULT_PCT) + 16:.1f}" text-anchor="end">'
-               f'always the model\'s default ({DEFAULT_PCT}%)</text>')
+               f'always the model\'s default ({DEFAULT_PCT:.1f}%)</text>')
 
     for p in points():
         kind = "local" if p["local"] else "cloud"

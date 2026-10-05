@@ -186,7 +186,7 @@ To get an OpenCode API key:
 
 How often each model picks the effort level that two Claude teachers (Sonnet 5.5 and Opus
 5.5) agreed on, with hindsight, for 136 held-out turns from 35 real coding sessions. Always
-keeping the model's default scores 52.9%. Each model got the request the mod sends it, one
+keeping the model's default scores 51.5%. Each model got the request the mod sends it, one
 request at a time. The local runs used the same llama.cpp on the same Mac; cloud latency
 includes the round trip from that Mac to the provider. Clef (27B) and Clef-Flash (9B) ran
 on Cloudflare Workers AI, since neither runs well on a 24 GB Mac: Clef-Flash in llama.cpp
@@ -194,10 +194,15 @@ took 3.4 s per prompt at the median, at 4-bit.
 
 ![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](docs/benchmark.svg)
 
-The green zone is where a picker should be: under 400 ms at the median, the
-[Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
-engaged with a system instead of waiting on it, and above 60%, clearly better than keeping
-the model's default.
+The green zone is where a picker should be, with both edges set by a rule rather than read
+off the results:
+
+- **Fast**: under 400 ms at the median, the
+  [Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
+  engaged with a system instead of waiting on it.
+- **Accurate**: at least 59.6% right, the lowest score that beats always keeping the
+  default (51.5%) by more than chance on these 136 turns (one-sided exact binomial test,
+  p < 0.05). [`pipeline/plot.py`](training/pipeline/plot.py) computes it from the results.
 
 | Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | :- | :- | -: | -: | -: | -: |
@@ -222,8 +227,11 @@ Notes:
   answers `max` on 12 of the 136 turns.
 - Kev and both Clef models report a confidence of 0.5 or more on at most 2 of the 136
   turns (median 0.12 to 0.18), so with the default threshold the mod almost never applies
-  their picks: "right level applied" stays near the always-default 52.9%. Jev clears it on half the
+  their picks: "right level applied" stays near the always-default 51.5%. Jev clears it on half the
   turns.
+- Compared turn by turn with keeping the default (exact McNemar test, one-sided), Nisev
+  (p = 0.009) and Jev (p = 0.04) are better by more than chance; Kev (p = 0.18), Clef-Flash
+  (p = 0.21) and Clef (p = 0.55) are not.
 - With 136 turns, gaps of a few points are within noise. Kev, Clef and Jev answer
   zero-shot; Nisev was trained on this question, from the same kind of sessions.
 

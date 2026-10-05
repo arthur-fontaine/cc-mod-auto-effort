@@ -37,15 +37,20 @@ answers.
 
 136 held-out turns from 35 real coding sessions. The answer key is the category on which
 two Claude teachers (Sonnet 5.5 and Opus 5.5) agree after seeing what happened in the
-turn. Always keeping the model's default scores 52.9%. Every model got the request the mod
+turn. Always keeping the model's default scores 51.5%. Every model got the request the mod
 sends it, one request at a time; cloud latency includes the round trip from the Mac.
 
 ![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](benchmark.svg)
 
-The green zone is where a picker should be: under 400 ms at the median, the
-[Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
-engaged with a system instead of waiting on it, and above 60%, clearly better than keeping
-the model's default.
+The green zone is where a picker should be, with both edges set by a rule rather than read
+off the results:
+
+- **Fast**: under 400 ms at the median, the
+  [Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
+  engaged with a system instead of waiting on it.
+- **Accurate**: at least 59.6% right, the lowest score that beats always keeping the
+  default (51.5%) by more than chance on these 136 turns (one-sided exact binomial test,
+  p < 0.05). [`pipeline/plot.py`](https://github.com/arthur-fontaine/cc-mod-auto-effort/blob/main/training/pipeline/plot.py) computes it from the results.
 
 {{benchmark}}
 

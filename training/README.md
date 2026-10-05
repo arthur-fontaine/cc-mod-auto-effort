@@ -241,7 +241,7 @@ that Sonnet 5.5 and Opus 5.5 each chose independently after reading what happene
 turn (the work done, tests run, the user's next message); only turns where they agree are
 kept. Every percentage below is the share of those 136 turns where a classifier matches
 that key, so 100% means agreeing with both teachers' hindsight judgment every time. Always
-picking the model's default is the floor (52.9% of levels). No test session is in training. "Right
+picking the model's default is the floor (51.5% of levels). No test session is in training. "Right
 level" maps the category through the table for the Claude model that ran the turn; "right
 level on Opus 5.5" scores the same turns as if they ran on Opus 5.5, whose default is
 `medium`. "Right level applied" is what the mod ends up doing with its default confidence
@@ -251,7 +251,7 @@ ran through an in-process server; the llama.cpp row through `llama-server` b1140
 
 | Classifier | Category | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | -: | -: | -: | -: | -: |
-| Always the model's default | 30.9% | 52.9% | 52.9% | 52.9% |  |
+| Always the model's default | 30.9% | 51.5% | 55.1% | 51.5% |  |
 | TF-IDF + logistic regression | 41.2% | 53.7% | 59.6% | 55.1% |  |
 | Qwen3-1.7B, not fine-tuned | 25.7% | 52.2% | 31.6% | 52.9% | 140 / 393 ms |
 | Qwen3-4B-Instruct, not fine-tuned | 41.2% | 55.1% | 56.6% | 55.1% | 321 / 847 ms |

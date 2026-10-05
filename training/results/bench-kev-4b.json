@@ -1,0 +1,116 @@
+{
+ "name": "bench-kev-4b",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9191176470588235,
+  "macro_f1": 0.36397727272727276,
+  "confusion": {
+   "low": {
+    "medium": 5,
+    "high": 11,
+    "low": 5
+   },
+   "medium": {
+    "high": 25,
+    "medium": 6,
+    "low": 2
+   },
+   "high": {
+    "high": 63,
+    "medium": 6,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 4,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.22058823529411764,
+  "move_precision": 0.7666666666666667,
+  "applied_accuracy": 0.5220588235294118,
+  "applied_within_one": 0.8529411764705882
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.6029411764705882,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.3803982553982554,
+  "confusion": {
+   "low": {
+    "medium": 16,
+    "low": 5
+   },
+   "medium": {
+    "medium": 71,
+    "high": 2,
+    "low": 2
+   },
+   "high": {
+    "medium": 22,
+    "high": 5,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 2,
+    "max": 4,
+    "medium": 5,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6544117647058824,
+  "moves": 0.16176470588235295,
+  "move_precision": 0.8181818181818182,
+  "applied_accuracy": 0.5588235294117647,
+  "applied_within_one": 0.9117647058823529
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9191176470588235,
+  "macro_f1": 0.36397727272727276,
+  "confusion": {
+   "low": {
+    "medium": 5,
+    "high": 11,
+    "low": 5
+   },
+   "medium": {
+    "high": 25,
+    "medium": 6,
+    "low": 2
+   },
+   "high": {
+    "high": 63,
+    "medium": 6,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 4,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.22058823529411764,
+  "move_precision": 0.7666666666666667,
+  "applied_accuracy": 0.5220588235294118,
+  "applied_within_one": 0.8529411764705882
+ },
+ "latency_ms": {
+  "p50": 1750.473708001664,
+  "p95": 3235.9785420121625,
+  "max": 7563.6348749976605
+ },
+ "bench": {
+  "runtime": "llama.cpp b11406",
+  "file": "Kev-4B-Q8_0.gguf",
+  "size_gb": 4.48,
+  "where": "local",
+  "machine": "Apple M4 Pro, 24 GB"
+ }
+}

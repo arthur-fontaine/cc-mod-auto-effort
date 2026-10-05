@@ -1,0 +1,114 @@
+{
+ "name": "bench-jev-1.13",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.6176470588235294,
+  "within_one": 0.9264705882352942,
+  "macro_f1": 0.5942984711367064,
+  "confusion": {
+   "low": {
+    "low": 20,
+    "high": 1
+   },
+   "medium": {
+    "low": 15,
+    "high": 13,
+    "medium": 5
+   },
+   "high": {
+    "low": 9,
+    "medium": 10,
+    "high": 50,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 9,
+    "high": 2,
+    "max": 1
+   }
+  },
+  "direction_accuracy": 0.7352941176470589,
+  "moves": 0.5147058823529411,
+  "move_precision": 0.7142857142857143,
+  "applied_accuracy": 0.625,
+  "applied_within_one": 0.9264705882352942
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.7058823529411765,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.709608661538663,
+  "confusion": {
+   "low": {
+    "low": 20,
+    "medium": 1
+   },
+   "medium": {
+    "low": 19,
+    "medium": 50,
+    "high": 6
+   },
+   "high": {
+    "high": 17,
+    "low": 5,
+    "medium": 5,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 9,
+    "high": 2,
+    "max": 1
+   }
+  },
+  "direction_accuracy": 0.7352941176470589,
+  "moves": 0.5882352941176471,
+  "move_precision": 0.625,
+  "applied_accuracy": 0.7573529411764706,
+  "applied_within_one": 0.9338235294117647
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.6176470588235294,
+  "within_one": 0.9264705882352942,
+  "macro_f1": 0.5942984711367064,
+  "confusion": {
+   "low": {
+    "low": 20,
+    "high": 1
+   },
+   "medium": {
+    "low": 15,
+    "high": 13,
+    "medium": 5
+   },
+   "high": {
+    "low": 9,
+    "medium": 10,
+    "high": 50,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 9,
+    "high": 2,
+    "max": 1
+   }
+  },
+  "direction_accuracy": 0.7352941176470589,
+  "moves": 0.5147058823529411,
+  "move_precision": 0.7142857142857143,
+  "applied_accuracy": 0.625,
+  "applied_within_one": 0.9264705882352942
+ },
+ "latency_ms": {
+  "p50": 587.8518339886796,
+  "p95": 770.3346660127863,
+  "max": 1380.083124997327
+ },
+ "bench": {
+  "where": "cloud",
+  "provider": "OpenCode Zen",
+  "client": "Apple M4 Pro, 24 GB"
+ }
+}

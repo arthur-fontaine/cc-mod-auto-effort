@@ -1,0 +1,125 @@
+{
+ "name": "bench-clef-flash",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.4411764705882353,
+  "within_one": 0.8529411764705882,
+  "macro_f1": 0.4179708222811671,
+  "confusion": {
+   "low": {
+    "low": 4,
+    "medium": 10,
+    "high": 7
+   },
+   "medium": {
+    "high": 8,
+    "medium": 21,
+    "max": 3,
+    "low": 1
+   },
+   "high": {
+    "medium": 26,
+    "high": 31,
+    "max": 6,
+    "xhigh": 4,
+    "low": 3
+   },
+   "xhigh": {
+    "xhigh": 4,
+    "max": 7,
+    "medium": 1
+   }
+  },
+  "direction_accuracy": 0.5735294117647058,
+  "moves": 0.6617647058823529,
+  "move_precision": 0.5222222222222223,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.5735294117647058,
+  "within_one": 0.9044117647058824,
+  "macro_f1": 0.39467084639498434,
+  "confusion": {
+   "low": {
+    "low": 4,
+    "medium": 16,
+    "high": 1
+   },
+   "medium": {
+    "medium": 68,
+    "high": 2,
+    "max": 3,
+    "low": 2
+   },
+   "high": {
+    "max": 6,
+    "medium": 14,
+    "xhigh": 4,
+    "low": 2,
+    "high": 2
+   },
+   "xhigh": {
+    "xhigh": 4,
+    "max": 7,
+    "medium": 1
+   }
+  },
+  "direction_accuracy": 0.6985294117647058,
+  "moves": 0.27205882352941174,
+  "move_precision": 0.7297297297297297,
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9117647058823529
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.4411764705882353,
+  "within_one": 0.8529411764705882,
+  "macro_f1": 0.4179708222811671,
+  "confusion": {
+   "low": {
+    "low": 4,
+    "medium": 10,
+    "high": 7
+   },
+   "medium": {
+    "high": 8,
+    "medium": 21,
+    "max": 3,
+    "low": 1
+   },
+   "high": {
+    "medium": 26,
+    "high": 31,
+    "max": 6,
+    "xhigh": 4,
+    "low": 3
+   },
+   "xhigh": {
+    "xhigh": 4,
+    "max": 7,
+    "medium": 1
+   }
+  },
+  "direction_accuracy": 0.5735294117647058,
+  "moves": 0.6617647058823529,
+  "move_precision": 0.5222222222222223,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "latency_ms": {
+  "p50": 3384.360750002088,
+  "p95": 5458.920000004582,
+  "max": 12311.109292000765
+ },
+ "bench": {
+  "runtime": "llama.cpp b11406",
+  "file": "Clef-Flash-Q4_K_M.gguf",
+  "size_gb": 6.49,
+  "where": "local",
+  "machine": "Apple M4 Pro, 24 GB"
+ }
+}

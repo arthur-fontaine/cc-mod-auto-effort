@@ -1,6 +1,6 @@
 """Export a fine-tuned run as a llama.cpp decision model (GGUF), served at /v1/systemone.
 
-    uv run --group merge python pipeline/export_gguf.py runs/qwen3-1.7b --llama-cpp ~/src/llama.cpp
+    uv run --group merge python pipeline/export_gguf.py runs/qwen3-1.7b --llama-cpp ~/src/llama.cpp   # -> runs/qwen3-1.7b/nisev-1.7b-Q8_0.gguf
 
 llama.cpp (build b11361 and later) serves "decision models" from GGUF metadata. This model
 uses the `openjev` decision type: one letter per option, read from the next-token logits
@@ -50,7 +50,7 @@ def main():
     parser.add_argument("--llama-cpp", type=Path, required=True, help="llama.cpp source tree (b11361 or later)")
     parser.add_argument("--outtype", default="q8_0")
     parser.add_argument("--temperature", type=float, help="Default: the run's fused-8bit/calibration.json")
-    parser.add_argument("--name", default="auto-effort")
+    parser.add_argument("--name", default="nisev-1.7b")
     args = parser.parse_args()
 
     fused = args.run / "fused"

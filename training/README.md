@@ -1,6 +1,6 @@
-# Local effort classifier
+# Nisev
 
-A small Jev-like model that sizes each prompt for the auto-effort mod and runs on an Apple
+Nisev is a small Jev-like model that sizes each prompt for the auto-effort mod and runs on an Apple
 silicon Mac. It follows the recipe in Together's
 [How to train your own Jev for $17](https://x.com/nutlope/status/2102881280115249597)
 ([togethercomputer/tev1](https://github.com/togethercomputer/tev1)): a JSON decision task,
@@ -57,7 +57,9 @@ uv run python pipeline/export.py runs/qwen3-1.7b                # fuse, then 8-b
 uv run python pipeline/calibrate.py runs/qwen3-1.7b/fused-8bit  # temperature fitted on dev
 uv run python pipeline/evaluate.py --model runs/qwen3-1.7b/fused-8bit --name qwen3-1.7b
 uv run --group merge python pipeline/export_gguf.py runs/qwen3-1.7b --llama-cpp ~/src/llama.cpp   # see Serve it
+uv run python pipeline/benchmark.py  # Nisev, Kev, Clef-Flash in llama.cpp, and Jev (needs AUTO_EFFORT_API_KEY)
 uv run python pipeline/report.py
+uv run python pipeline/publish.py runs/qwen3-1.7b --repo arthur-fontaine/nisev-1.7b-GGUF   # after `uv run hf auth login`
 uv run python -m unittest discover -s tests
 ```
 
@@ -210,15 +212,15 @@ GGUF and adds what llama.cpp needs to answer decisions:
   calibrated.
 
 It needs a llama.cpp source tree (for `convert_hf_to_gguf.py` and `gguf-py`) and writes
-`runs/qwen3-1.7b/auto-effort-Q8_0.gguf`, 1.8 GB. To serve it by hand:
+`runs/qwen3-1.7b/nisev-1.7b-Q8_0.gguf`, 1.8 GB. To serve it by hand:
 
 ```sh
-llama-server -m runs/qwen3-1.7b/auto-effort-Q8_0.gguf --port 8765 --alias auto-effort   # or: llama serve …
+llama-server -m runs/qwen3-1.7b/nisev-1.7b-Q8_0.gguf --port 8765 --alias nisev   # or: llama serve …
 ```
 
 Users don't need any of this: `/auto-effort setup` in the mod starts `llama-server` (or
 `llama serve`) with `-hf` on the published GGUF, which llama.cpp downloads on first start.
-The mod sends the local model the question it was trained on and maps the category it
+The mod sends Nisev the question it was trained on and maps the category it
 picks through the table for the session's model (`hooks/policy.js`, checked against
 [`pipeline/task.py`](pipeline/task.py) and [`pipeline/models.py`](pipeline/models.py) by
 `tests/test_pipeline.py`).
@@ -227,6 +229,11 @@ On the 136 test turns, the GGUF picks the same letter as the MLX model on 132 an
 within a point of it (table below).
 
 ## Results
+
+For the models you can actually plug into the mod (Nisev, Kev-4B and Clef-Flash in llama.cpp,
+Jev in the cloud), [`pipeline/benchmark.py`](pipeline/benchmark.py) reruns them all the same
+way; its table is in the [main README](../README.md#benchmark). The table below is every
+classifier tried along the way, on the runtimes available at the time.
 
 The test set is 136 held-out turns from 35 Claude sessions. Its answer key is the category
 that Sonnet 5.5 and Opus 5.5 each chose independently after reading what happened in the

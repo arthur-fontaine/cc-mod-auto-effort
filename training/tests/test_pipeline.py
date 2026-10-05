@@ -60,7 +60,7 @@ class Tables(unittest.TestCase):
 
 
 class ModContract(unittest.TestCase):
-    """The mod (hooks/policy.js) must ask the local model what it was trained on."""
+    """The mod (hooks/policy.js) must ask Nisev what it was trained on."""
 
     @classmethod
     def setUpClass(cls):

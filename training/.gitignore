@@ -10,3 +10,4 @@ results/*.predictions.jsonl
 logs/
 external/
 cloud/dist/
+models/

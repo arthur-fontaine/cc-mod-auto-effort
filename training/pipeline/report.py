@@ -1,4 +1,4 @@
-"""Print the results table for the README from results/*.json.
+"""Print the README tables from results/*.json: the benchmark, then every classifier tried.
 
     uv run python pipeline/report.py
 """
@@ -24,11 +24,43 @@ ROWS = [
 ]
 
 
+# pipeline/benchmark.py's contenders, as the mod would use them.
+BENCH = [
+    ("nisev", "**Nisev 1.7B** (this repo)"),
+    ("kev-4b", "Kev-4B"),
+    ("clef-flash", "Clef-Flash 9B"),
+    ("clef-flash-cloud", "Clef-Flash 9B"),
+    ("jev-1.13", "Jev 1.13"),
+]
+
+
 def pct(x):
     return "" if x is None else f"{100 * x:.1f}%"
 
 
+def benchmark_table():
+    lines = ["| Model | Where | Served by | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |",
+             "| :- | :- | :- | -: | -: | -: | -: |"]
+    for name, label in BENCH:
+        path = ROOT / "results" / f"bench-{name}.json"
+        if not path.exists():
+            continue
+        r = json.loads(path.read_text())
+        b, lat = r["bench"], r["latency_ms"]
+        if b["where"] == "local":
+            where, served = f"Local, {b['machine']}", f"{b['runtime']}, `{b['file']}` ({b['size_gb']:.1f} GB)"
+        else:
+            where, served = "Cloud", f"{b['provider']}, network round trip included"
+        lines.append(f"| {label} | {where} | {served} | {pct(r['level_actual_model']['accuracy'])} "
+                     f"| {pct(r['level_as_claude-opus-5-5']['accuracy'])} "
+                     f"| {pct(r['level_actual_model']['applied_accuracy'])} "
+                     f"| {lat['p50']:.0f} / {lat['p95']:.0f} ms |")
+    return "\n".join(lines)
+
+
 def main():
+    print(benchmark_table())
+    print()
     print("| Classifier | Category | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |")
     print("| :- | -: | -: | -: | -: | -: |")
     for name, label in ROWS:

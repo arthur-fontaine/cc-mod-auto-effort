@@ -147,6 +147,7 @@ def ask_systemone(question, ex, env, clip_limits=False):
         try:
             with urllib.request.urlopen(req, timeout=120) as r:
                 body = json.load(r)
+                body = body if "answers" in body else body["result"]  # Cloudflare wraps it in `result`
                 return body["answers"]["effort"], (time.perf_counter() - started) * 1000, body.get("usage") or {}
         except Exception:
             if attempt == 3:

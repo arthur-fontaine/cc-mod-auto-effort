@@ -1,0 +1,113 @@
+{
+ "name": "bench-clef-cloud",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5147058823529411,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.42899469195792594,
+  "confusion": {
+   "low": {
+    "medium": 10,
+    "low": 7,
+    "high": 4
+   },
+   "medium": {
+    "high": 9,
+    "medium": 21,
+    "max": 1,
+    "low": 2
+   },
+   "high": {
+    "medium": 23,
+    "high": 41,
+    "xhigh": 6
+   },
+   "xhigh": {
+    "max": 11,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6838235294117647,
+  "moves": 0.6029411764705882,
+  "move_precision": 0.6341463414634146,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.6544117647058824,
+  "within_one": 0.9926470588235294,
+  "macro_f1": 0.4961869190360436,
+  "confusion": {
+   "low": {
+    "medium": 14,
+    "low": 7
+   },
+   "medium": {
+    "medium": 67,
+    "high": 5,
+    "max": 1,
+    "low": 2
+   },
+   "high": {
+    "high": 14,
+    "medium": 8,
+    "xhigh": 6
+   },
+   "xhigh": {
+    "max": 11,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.7794117647058824,
+  "moves": 0.34558823529411764,
+  "move_precision": 0.8297872340425532,
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9191176470588235
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5147058823529411,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.42899469195792594,
+  "confusion": {
+   "low": {
+    "medium": 10,
+    "low": 7,
+    "high": 4
+   },
+   "medium": {
+    "high": 9,
+    "medium": 21,
+    "max": 1,
+    "low": 2
+   },
+   "high": {
+    "medium": 23,
+    "high": 41,
+    "xhigh": 6
+   },
+   "xhigh": {
+    "max": 11,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6838235294117647,
+  "moves": 0.6029411764705882,
+  "move_precision": 0.6341463414634146,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "latency_ms": {
+  "p50": 494.6329579979647,
+  "p95": 880.2413750090636,
+  "max": 1645.683291979367
+ },
+ "bench": {
+  "where": "cloud",
+  "provider": "Cloudflare Workers AI",
+  "client": "Apple M4 Pro, 24 GB"
+ }
+}

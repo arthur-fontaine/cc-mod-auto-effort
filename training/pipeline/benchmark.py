@@ -8,7 +8,7 @@ Local models are GGUFs from the Hub (downloaded once to models/), served one at 
 the llama.cpp on your PATH (`llama-server`, or the unified `llama serve`) with the flags
 the mod uses, so they all run on the same runtime. Cloud models are called at their
 endpoint, with the key in the variable each one names (AUTO_EFFORT_API_KEY for Jev;
-CLOUDFLARE_API_TOKEN, a Workers AI token, and CLOUDFLARE_ACCOUNT_ID for Clef-Flash). Nisev gets the category question it was trained on;
+CLOUDFLARE_API_TOKEN, a Workers AI token, and CLOUDFLARE_ACCOUNT_ID for Clef and Clef-Flash). Nisev gets the category question it was trained on;
 the others get the mod's effort question, as the mod sends it to any Jev endpoint.
 Results go to results/bench-NAME.json.
 """
@@ -32,13 +32,14 @@ CONTENDERS = {
               # The local export, when there is one, so the benchmark runs before publishing.
               "local": ROOT / "runs" / "qwen3-1.7b" / "nisev-1.7b-Q8_0.gguf"},
     "kev-4b": {"hub": ("ggml-org/Kev-4B-GGUF", "Kev-4B-Q8_0.gguf")},
-    # Clef reads embeddings, which needs the whole prompt in one physical batch (512 by default).
-    "clef-flash": {"hub": ("ggml-org/Clef-Flash-GGUF", "Clef-Flash-Q4_K_M.gguf"), "args": ["-b", "4096", "-ub", "4096"]},
     "jev-1.13": {"endpoint": "https://opencode.ai/zen/v1/systemone", "api_model": "jev-1.13",
                  "provider": "OpenCode Zen", "key": "AUTO_EFFORT_API_KEY"},
     "clef-flash-cloud": {"endpoint": "https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}"
                                      "/ai/run/@cf/cloudflare/clef-flash",
                          "api_model": "clef-flash", "provider": "Cloudflare Workers AI", "key": "CLOUDFLARE_API_TOKEN"},
+    "clef-cloud": {"endpoint": "https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}"
+                               "/ai/run/@cf/cloudflare/clef",
+                   "api_model": "clef", "provider": "Cloudflare Workers AI", "key": "CLOUDFLARE_API_TOKEN"},
 }
 
 

@@ -28,8 +28,8 @@ ROWS = [
 BENCH = [
     ("nisev", "**Nisev 1.7B** (this repo)"),
     ("kev-4b", "Kev-4B"),
-    ("clef-flash", "Clef-Flash 9B"),
     ("clef-flash-cloud", "Clef-Flash 9B"),
+    ("clef-cloud", "Clef 27B"),
     ("jev-1.13", "Jev 1.13"),
 ]
 

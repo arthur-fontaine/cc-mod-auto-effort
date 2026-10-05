@@ -57,7 +57,7 @@ uv run python pipeline/export.py runs/qwen3-1.7b                # fuse, then 8-b
 uv run python pipeline/calibrate.py runs/qwen3-1.7b/fused-8bit  # temperature fitted on dev
 uv run python pipeline/evaluate.py --model runs/qwen3-1.7b/fused-8bit --name qwen3-1.7b
 uv run --group merge python pipeline/export_gguf.py runs/qwen3-1.7b --llama-cpp ~/src/llama.cpp   # see Serve it
-uv run python pipeline/benchmark.py  # Nisev, Kev, Clef-Flash in llama.cpp, and Jev (needs AUTO_EFFORT_API_KEY)
+uv run python pipeline/benchmark.py  # Nisev and Kev in llama.cpp; Jev, Clef, Clef-Flash in the cloud (keys: see the script)
 uv run python pipeline/report.py
 uv run python pipeline/publish.py runs/qwen3-1.7b --repo arthur-fontaine/nisev-1.7b-GGUF   # after `uv run hf auth login`
 uv run python -m unittest discover -s tests
@@ -230,8 +230,8 @@ within a point of it (table below).
 
 ## Results
 
-For the models you can actually plug into the mod (Nisev, Kev-4B and Clef-Flash in llama.cpp,
-Jev in the cloud), [`pipeline/benchmark.py`](pipeline/benchmark.py) reruns them all the same
+For the models you can actually plug into the mod (Nisev and Kev-4B in llama.cpp; Jev, Clef
+and Clef-Flash in the cloud), [`pipeline/benchmark.py`](pipeline/benchmark.py) reruns them all the same
 way; its table is in the [main README](../README.md#benchmark). The table below is every
 classifier tried along the way, on the runtimes available at the time.
 

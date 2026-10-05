@@ -167,7 +167,7 @@ session or run `/reload-plugins`.
 | Nisev | started by the mod | `nisev` | none |
 | OpenCode Zen | `https://opencode.ai/zen/v1/systemone` | `jev-1.13` or `jev-1.13-free` | An OpenCode API key, see below |
 | TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | A key from <https://console.typesafe.ai/keys> |
-| Cloudflare Workers AI (Clef) | `https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef-flash` | `clef-flash` | A token with the Workers AI template |
+| Cloudflare Workers AI (Clef) | `https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef` (or `…/clef-flash`) | `clef` (or `clef-flash`) | A token with the Workers AI template |
 
 Nisev needs about 2 GB of memory while the session runs. To use another decision model
 in llama.cpp, start it yourself (`llama-server -hf ggml-org/Kev-4B-GGUF:Q8_0 --port 8080`,
@@ -187,15 +187,17 @@ To get an OpenCode API key:
 How often each model picks the effort level that two Claude teachers (Sonnet 5.5 and Opus
 5.5) agreed on, with hindsight, for 136 held-out turns from 35 real coding sessions. Always
 keeping the model's default scores 52.9%. Each model got the request the mod sends it, one
-request at a time. The local runs all used the same llama.cpp on the same Mac; cloud
-latency includes the round trip from that Mac to the provider.
+request at a time. The local runs used the same llama.cpp on the same Mac; cloud latency
+includes the round trip from that Mac to the provider. Clef (27B) and Clef-Flash (9B) ran
+on Cloudflare Workers AI, since neither runs well on a 24 GB Mac: Clef-Flash in llama.cpp
+took 3.4 s per prompt at the median, at 4-bit.
 
 | Model | Where | Served by | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |
 | :- | :- | :- | -: | -: | -: | -: |
 | **Nisev 1.7B** (this repo) | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `nisev-1.7b-Q8_0.gguf` (1.8 GB) | 65.4% | 73.5% | 66.9% | 129 / 364 ms |
 | Kev-4B | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `Kev-4B-Q8_0.gguf` (4.5 GB) | 55.1% | 60.3% | 52.2% | 1750 / 3236 ms |
-| Clef-Flash 9B | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `Clef-Flash-Q4_K_M.gguf` (6.5 GB) | 44.1% | 57.4% | 51.5% | 3384 / 5459 ms |
 | Clef-Flash 9B | Cloud | Cloudflare Workers AI, network round trip included | 56.6% | 64.7% | 51.5% | 309 / 909 ms |
+| Clef 27B | Cloud | Cloudflare Workers AI, network round trip included | 51.5% | 65.4% | 51.5% | 495 / 880 ms |
 | Jev 1.13 | Cloud | OpenCode Zen, network round trip included | 61.8% | 70.6% | 62.5% | 588 / 770 ms |
 
 - **Level**: the pick, for the Claude model that ran the turn.
@@ -206,14 +208,14 @@ latency includes the round trip from that Mac to the provider.
 
 Notes:
 
-- Run locally, Clef-Flash's p95 is past the mod's default 4 s timeout, so some of its turns
-  would keep the session's effort. Its 4-bit file also scores well below the same model on
-  Workers AI (a 4-bit MLX copy scored about the same 45% earlier), so quantization seems to
-  cost Clef more than the others.
-- Kev and Clef-Flash report a confidence of 0.5 or more on at most 1% of turns (median
-  0.06 to 0.16), so with the default threshold the mod almost never applies their picks:
-  "applied" stays near the always-default 52.9%.
-- With 136 turns, gaps of a few points are within noise. Kev, Clef-Flash and Jev answer
+- Both Clef models answer `medium` most often (40% of turns), which suits Opus 5.5, whose
+  default is `medium`, and is a step too low on models that default to `high`. Clef also
+  answers `max` on 12 of the 136 turns.
+- Kev and both Clef models report a confidence of 0.5 or more on at most 2 of the 136
+  turns (median 0.12 to 0.18), so with the default threshold the mod almost never applies
+  their picks: "applied" stays near the always-default 52.9%. Jev clears it on half the
+  turns.
+- With 136 turns, gaps of a few points are within noise. Kev, Clef and Jev answer
   zero-shot; Nisev was trained on this question, from the same kind of sessions.
 
 Rerun it with `uv run python pipeline/benchmark.py` in [`training/`](training/README.md),

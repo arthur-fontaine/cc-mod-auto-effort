@@ -37,11 +37,18 @@ answers.
 
 136 held-out turns from 35 real coding sessions. The answer key is the category on which
 two Claude teachers (Sonnet 5.5 and Opus 5.5) agree after seeing what happened in the
-turn. "Level" maps it to the effort level for the Claude model that ran the turn; always
-keeping the model's default scores 52.9%. Every model got the request the mod sends it;
-latency is end to end on an Apple M4 Pro (24 GB), one request at a time.
+turn. Always keeping the model's default scores 52.9%. Every model got the request the mod
+sends it, one request at a time; cloud latency includes the round trip from the Mac.
 
 {{benchmark}}
+
+- **Right level**: how often the model picked the effort level the teachers chose, for
+  the Claude model that actually ran the turn.
+- **Right level on Opus 5.5**: the same, scoring the same turns as if they had run on Opus
+  5.5. Its default effort is `medium`, where most other models default to `high`.
+- **Right level applied**: how often the mod ends up running the turn at the right level.
+  It applies a pick only when its confidence is at least 0.5 (the default threshold), and
+  otherwise keeps the session's effort.
 
 With 136 turns, gaps of a few points are within noise. Method and limits:
 [training/README.md](https://github.com/arthur-fontaine/cc-mod-auto-effort/blob/main/training/README.md).

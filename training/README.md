@@ -240,15 +240,15 @@ that Sonnet 5.5 and Opus 5.5 each chose independently after reading what happene
 turn (the work done, tests run, the user's next message); only turns where they agree are
 kept. Every percentage below is the share of those 136 turns where a classifier matches
 that key, so 100% means agreeing with both teachers' hindsight judgment every time. Always
-picking the model's default is the floor (52.9% of levels). No test session is in training. "Level"
-maps the category through the table for the model that ran the turn; "as Opus 5.5" maps
-the same turns as if they ran on Opus 5.5. "Mod applies right level" is what the mod ends
-up doing with its default confidence threshold of 0.5: the pick when confident enough,
-otherwise the session's own effort. Latency is measured end to end on an M4 Pro (24 GB),
+picking the model's default is the floor (52.9% of levels). No test session is in training. "Right
+level" maps the category through the table for the Claude model that ran the turn; "right
+level on Opus 5.5" scores the same turns as if they ran on Opus 5.5, whose default is
+`medium`. "Right level applied" is what the mod ends up doing with its default confidence
+threshold of 0.5: the pick when confident enough, otherwise the session's own effort. Latency is measured end to end on an M4 Pro (24 GB),
 one request at a time; Jev's includes the network round trip to OpenCode Zen. The MLX rows
 ran through an in-process server; the llama.cpp row through `llama-server` b11408.
 
-| Classifier | Category | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |
+| Classifier | Category | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | -: | -: | -: | -: | -: |
 | Always the model's default | 30.9% | 52.9% | 52.9% | 52.9% |  |
 | TF-IDF + logistic regression | 41.2% | 53.7% | 59.6% | 55.1% |  |
@@ -272,7 +272,7 @@ against 91.9%. It answers in 145 ms at the median and 406 ms at p95 (max 827 ms)
 625 / 749 ms for Jev. Jev was asked through the mod's own request, model included. With
 n = 136 the accuracy gaps are a few points of standard error, so read them as "at least as
 good as Jev, locally, at a quarter of the latency" rather than as precise margins.
-Lowering `AUTO_EFFORT_MIN_CONFIDENCE` to 0.45, the best value on dev, raises "applied" to
+Lowering `AUTO_EFFORT_MIN_CONFIDENCE` to 0.45, the best value on dev, raises "right level applied" to
 66.9%. The student agrees with its prompt-only teacher on 63.2% of test categories, so
 most of the remaining gap to the teacher is distillation, which more data would help.
 

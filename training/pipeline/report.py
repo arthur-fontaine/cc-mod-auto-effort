@@ -39,7 +39,7 @@ def pct(x):
 
 
 def benchmark_table():
-    lines = ["| Model | Where | Served by | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |",
+    lines = ["| Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |",
              "| :- | :- | :- | -: | -: | -: | -: |"]
     for name, label in BENCH:
         path = ROOT / "results" / f"bench-{name}.json"
@@ -61,7 +61,7 @@ def benchmark_table():
 def main():
     print(benchmark_table())
     print()
-    print("| Classifier | Category | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |")
+    print("| Classifier | Category | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |")
     print("| :- | -: | -: | -: | -: | -: |")
     for name, label in ROWS:
         path = ROOT / "results" / f"{name}.json"

@@ -192,7 +192,7 @@ includes the round trip from that Mac to the provider. Clef (27B) and Clef-Flash
 on Cloudflare Workers AI, since neither runs well on a 24 GB Mac: Clef-Flash in llama.cpp
 took 3.4 s per prompt at the median, at 4-bit.
 
-| Model | Where | Served by | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |
+| Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | :- | :- | -: | -: | -: | -: |
 | **Nisev 1.7B** (this repo) | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `nisev-1.7b-Q8_0.gguf` (1.8 GB) | 65.4% | 73.5% | 66.9% | 129 / 364 ms |
 | Kev-4B | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `Kev-4B-Q8_0.gguf` (4.5 GB) | 55.1% | 60.3% | 52.2% | 1750 / 3236 ms |
@@ -200,11 +200,13 @@ took 3.4 s per prompt at the median, at 4-bit.
 | Clef 27B | Cloud | Cloudflare Workers AI, network round trip included | 51.5% | 65.4% | 51.5% | 495 / 880 ms |
 | Jev 1.13 | Cloud | OpenCode Zen, network round trip included | 61.8% | 70.6% | 62.5% | 588 / 770 ms |
 
-- **Level**: the pick, for the Claude model that ran the turn.
-- **Level, as Opus 5.5**: the same turns, as if they ran on Opus 5.5, whose default is
-  `medium`.
-- **Mod applies right level**: what the mod ends up doing with its default confidence
-  threshold of 0.5: the pick when confident enough, otherwise the session's own effort.
+- **Right level**: how often the model picked the effort level the teachers chose, for
+  the Claude model that actually ran the turn.
+- **Right level on Opus 5.5**: the same, scoring the same turns as if they had run on Opus
+  5.5. Its default effort is `medium`, where most other models default to `high`.
+- **Right level applied**: how often the mod ends up running the turn at the right level.
+  It applies a pick only when its confidence is at least 0.5 (the default threshold), and
+  otherwise keeps the session's effort.
 
 Notes:
 
@@ -213,7 +215,7 @@ Notes:
   answers `max` on 12 of the 136 turns.
 - Kev and both Clef models report a confidence of 0.5 or more on at most 2 of the 136
   turns (median 0.12 to 0.18), so with the default threshold the mod almost never applies
-  their picks: "applied" stays near the always-default 52.9%. Jev clears it on half the
+  their picks: "right level applied" stays near the always-default 52.9%. Jev clears it on half the
   turns.
 - With 136 turns, gaps of a few points are within noise. Kev, Clef and Jev answer
   zero-shot; Nisev was trained on this question, from the same kind of sessions.

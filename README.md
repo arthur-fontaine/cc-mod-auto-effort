@@ -196,25 +196,45 @@ lacks its endpoint, key or model, the mod changes nothing, and the status line a
 
 [Anthropic's guidance](https://claude.com/blog/claude-model-and-effort-level-in-claude-code)
 is that the model's default effort is right for most tasks, so effort should change only
-for a clear reason. For each prompt, the mod:
+for a clear reason. Two models are involved: the **decision model** you chose in setup
+(Nisev, Jev or Clef), which picks a level, and the **Claude model** of your session, which
+does the work at that level. For each prompt, the mod:
 
-1. **Asks the provider** about your prompt, Claude's previous reply (so "yes, do it" makes
-   sense), and the session's model. Effort is calibrated per model: Opus 5.5 defaults to
-   `medium`, most others to `high`.
+1. **Asks the decision model** how much effort the prompt needs. It sends:
+   - your prompt;
+   - Claude's previous reply, because a short follow-up means nothing alone. After Claude
+     asks "Want me to migrate all 40 API handlers and update their tests?", the prompt
+     "yes, do it" is a big task, and only the previous reply says so.
+   - the name of the Claude model, because effort is calibrated per model: Opus 5.5
+     defaults to `medium`, most others to `high`.
+2. **Gets a pick and a confidence** back: a level, and how sure the decision model is of
+   it, from 0 to 100%.
    - A cloud model picks one of `low`, `medium`, `default`, `high`, `xhigh` and `max`,
      each described with the blog post's rubric.
-   - Nisev sorts the request into one of six kinds of task, from `trivial` to `exhaustive`.
-     A table in [`hooks/policy.js`](hooks/policy.js) turns that into a level for the
-     session's model.
-2. **Applies the pick** to every request of that turn, clamped to
-   `AUTO_EFFORT_MIN_EFFORT`–`AUTO_EFFORT_MAX_EFFORT` (`low`–`xhigh` by default).
-3. **Shows it** on the status line, for example `effort high · 82%`.
+   - Nisev picks a kind of task, from `trivial` to `exhaustive`, and a table in
+     [`hooks/policy.js`](hooks/policy.js) turns it into a level for your Claude model.
+     For example, multi-step work becomes `high`, and an ordinary request becomes the
+     model's default.
+3. **Applies the pick** to that turn only, within `AUTO_EFFORT_MIN_EFFORT`–`AUTO_EFFORT_MAX_EFFORT`
+   (`low`–`xhigh` by default). The next prompt is decided afresh.
 
-It leaves the session's own effort alone when:
+It keeps your session's effort instead, whether that's the Claude model's default or what you
+set with `/effort`, when:
 
-- the pick is the model's default, or its confidence is below `AUTO_EFFORT_MIN_CONFIDENCE`;
-- the provider times out or errors, or Nisev is still starting;
-- no provider is set up, the model takes no effort, or the request comes from a subagent.
+- the decision model picks the Claude model's default, which means nothing calls for a change;
+- its confidence is below `AUTO_EFFORT_MIN_CONFIDENCE` (50% by default);
+- it times out or errors, or Nisev is still starting;
+- no provider is set up, the Claude model takes no effort, or the request comes from a
+  subagent.
+
+The status line shows each decision, with the decision model's confidence:
+
+| Status line | Meaning |
+| :- | :- |
+| `effort high · 82%` | It picked `high`, 82% sure, so this turn runs at `high`. |
+| `effort default · 70%` | It picked the Claude model's default, so your session's effort stands. |
+| `effort default (unsure: high · 41%)` | It leaned to `high`, but only 41% sure, so your session's effort stands. |
+| `effort xhigh (picked max) · 75%` | It picked `max`, above the allowed range, so the turn runs at `xhigh`. |
 
 ## Benchmark
 

@@ -10,9 +10,23 @@ export const DEFAULTS = {
   includeContext: true,
 }
 
-// Keeps the request well under Jev's 32k-token budget for state plus question.
-const MAX_PROMPT_CHARS = 6000
-const MAX_CONTEXT_CHARS = 1500
+// The fine-tuned classifier, served by llama.cpp's llama-server as a decision model.
+export const LOCAL = {
+  // A Hugging Face repo for `llama-server -hf`, or a path to a .gguf file.
+  model: 'arthur-fontaine/auto-effort-qwen3-1.7b-GGUF:Q8_0',
+  sizeLabel: 'about 1.9 GB',
+  port: 8765,
+  // Tried in order when none is configured: the server binary, or the unified CLI (`llama serve`).
+  servers: ['llama-server', 'llama'],
+  alias: 'auto-effort',
+  // The first llama.cpp build with /v1/systemone (ggml-org/llama.cpp#29818).
+  minBuild: 11361,
+}
+
+export const JEV_PRESETS = {
+  'OpenCode Zen': { endpoint: 'https://opencode.ai/zen/v1/systemone', model: 'jev-1.13' },
+  TypeSafe: { endpoint: 'https://api.typesafe.ai/v1/systemone', model: 'jev-latest' },
+}
 
 // Worded after https://claude.com/blog/claude-model-and-effort-level-in-claude-code:
 // the model's default is right for most tasks, effort controls how thorough
@@ -28,12 +42,16 @@ export const EFFORT_QUESTION = {
       'task before checking back in. It is not about how capable Claude is. Most requests should get ' +
       '`default`. Pick another level only when the request clearly calls for less or more thoroughness. ' +
       '`previous_assistant_reply`, when present, is what Claude last said; use it to understand short ' +
-      'follow-ups such as "yes, do it".',
+      'follow-ups such as "yes, do it". `model`, when present, is the Claude model; `default` keeps that ' +
+      "model's own default effort.",
   },
   criteria: {
     low:
       'Routine work that needs no investigation: a precisely described edit, a rename, a typo, a one-line ' +
       'change, a question about code already in context, a quick lookup or shell command, small talk.',
+    medium:
+      'Light work: a small, well-scoped change or a focused answer that needs a little reading, but no ' +
+      'multi-file investigation.',
     default:
       'A typical coding request: an ordinary feature, a normal bug fix, a focused explanation, or anything ' +
       'unclear. The model default already scales the work to the task.',
@@ -51,11 +69,83 @@ export const EFFORT_QUESTION = {
   },
 }
 
-function clip(text, max) {
-  if (text.length <= max) return text
+// The question the local model was trained on, word for word (training/pipeline/task.py): it
+// sizes the request, and the model's table below turns the size into a level.
+export const CATEGORIES = ['trivial', 'light', 'ordinary', 'multi_step', 'hard', 'exhaustive']
+export const CATEGORY_QUESTION = {
+  type: 'choice',
+  instructions:
+    'A developer sent latest_user_message to an AI coding agent working in their repository. ' +
+    'How much thoroughness does it need: how many files to read, how much to verify, and how far ' +
+    'to push before checking back in? previous_assistant_reply, when present, is the agent\'s last ' +
+    'reply; use it to size short follow-ups such as "yes, do it".',
+  criteria: {
+    trivial: 'Routine: a precise small edit, a lookup, a question about code in context, an acknowledgement.',
+    light: 'A small, well-scoped change or focused answer that needs a little reading.',
+    ordinary: 'A typical feature, bug fix or explanation, or anything unclear.',
+    multi_step: 'Several files, several hypotheses, or work that must be verified by running tests.',
+    hard: 'A large migration, a subtle cross-system bug, an audit, or an explicit ask to be thorough.',
+    exhaustive: 'An explicit demand for maximum effort on a critical, very large task.',
+  },
+}
+
+// The level each kind of request gets on each model (training/pipeline/models.py). Levels are
+// calibrated per model: Opus 5.5 defaults to medium, so verified multi-step work is where it
+// pays to raise effort there, while models that default to high already run it at high.
+const HIGH = { trivial: 'low', light: 'medium', ordinary: 'high', multi_step: 'high', hard: 'xhigh', exhaustive: 'max' }
+const MEDIUM = { ...HIGH, ordinary: 'medium' }
+const NO_XHIGH = { ...HIGH, hard: 'high' }
+const NO_MAX = { ...HIGH, hard: 'high', exhaustive: 'high' }
+export const PROFILES = {
+  'claude-opus-5-5': { default: 'medium', table: MEDIUM },
+  'claude-sonnet-5-5': { default: 'high', table: HIGH },
+  'claude-fable-5-1': { default: 'high', table: HIGH },
+  'claude-opus-5': { default: 'high', table: HIGH },
+  'claude-sonnet-5': { default: 'high', table: HIGH },
+  'claude-fable-5': { default: 'high', table: HIGH },
+  'claude-opus-4-8': { default: 'high', table: HIGH },
+  'claude-opus-4-7': { default: 'high', table: HIGH },
+  'claude-opus-4-6': { default: 'high', table: NO_XHIGH },
+  'claude-sonnet-4-6': { default: 'high', table: NO_XHIGH },
+  'claude-opus-4-5': { default: 'high', table: NO_MAX },
+}
+const FALLBACK = { default: 'high', table: HIGH }
+const ALIASES = { opus: 'claude-opus-5-5', sonnet: 'claude-sonnet-5-5', fable: 'claude-fable-5-1' }
+
+// `claude-opus-5-5[1m]`, `us.anthropic.claude-opus-5-5-v1`, `opus` -> `claude-opus-5-5`
+export function normalizeModel(model) {
+  if (!model) return undefined
+  const m = String(model).toLowerCase().split('/').pop()
+    .replace(/^((us|eu|apac|global)\.)?anthropic\./, '')
+    .replace(/\[.*?\]$|:.*$|-v\d+$|-\d{8}$|-fast$/g, '')
+    .replaceAll('.', '-')
+  return ALIASES[m] ?? m
+}
+
+export function profileOf(model) {
+  return PROFILES[normalizeModel(model)] ?? FALLBACK
+}
+
+// Haiku 4.5 takes no effort; an unknown or missing model gets the common profile.
+export function takesEffort(model) {
+  return !(normalizeModel(model) ?? '').includes('haiku')
+}
+
+// Keeps the request well under the classifier's context.
+const CLIP = {
+  jev: { prompt: 6000, context: 1500 },
+  // What the local model was trained with (training/pipeline/task.py).
+  local: { prompt: 3000, context: 800 },
+}
+
+// Counts code points, as the Python that built the training data does, so a long prompt is
+// cut at the same place.
+export function clip(text, max) {
+  const chars = Array.from(text)
+  if (chars.length <= max) return text
   // Keep both ends: the ask is usually at the start, pasted output at the end.
   const half = Math.floor((max - 20) / 2)
-  return text.slice(0, half) + '\n[… truncated …]\n' + text.slice(-half)
+  return chars.slice(0, half).join('') + '\n[… truncated …]\n' + chars.slice(-half).join('')
 }
 
 function pick(...values) {
@@ -78,38 +168,55 @@ function toBool(value, fallback) {
   return fallback
 }
 
-// The endpoint, key, and model have no default, so the mod never calls a
-// provider the user didn't choose.
+// The endpoint, key, and model of a Jev provider have no default, so the mod never calls
+// a provider the user didn't choose.
 export const REQUIRED = {
   endpoint: 'AUTO_EFFORT_ENDPOINT',
   apiKey: 'AUTO_EFFORT_API_KEY',
   model: 'AUTO_EFFORT_MODEL',
 }
 
-// `env` holds the AUTO_EFFORT_* values, keyed as in the returned config.
-export function resolveConfig(env = {}) {
+// `env` holds the AUTO_EFFORT_* values, keyed as in the returned config. `stored` holds what
+// `/auto-effort setup` saved: never a key, and the environment wins over it.
+export function resolveConfig(env = {}, stored = {}) {
+  const requested = pick(env.provider, stored.provider)
+  const provider = ['jev', 'local'].includes(requested) ? requested : env.endpoint ? 'jev' : undefined
   const config = {
-    endpoint: pick(env.endpoint),
-    apiKey: pick(env.apiKey),
-    model: pick(env.model),
+    provider,
     minConfidence: toNumber(pick(env.minConfidence), DEFAULTS.minConfidence),
     timeoutMs: toNumber(pick(env.timeoutMs), DEFAULTS.timeoutMs),
     minEffort: toLevel(pick(env.minEffort), DEFAULTS.minEffort),
     maxEffort: toLevel(pick(env.maxEffort), DEFAULTS.maxEffort),
     includeContext: toBool(pick(env.includeContext), DEFAULTS.includeContext),
+    localModel: pick(env.localModel, stored.localModel, LOCAL.model),
+    localPort: toNumber(pick(env.localPort, stored.localPort), LOCAL.port),
+    llamaServer: pick(env.llamaServer, stored.llamaServer),
   }
-  config.missing = Object.keys(REQUIRED)
+  if (provider === 'local') {
+    config.endpoint = `http://127.0.0.1:${config.localPort}/v1/systemone`
+    config.apiKey = 'local'
+    config.model = LOCAL.alias
+  } else {
+    config.endpoint = pick(env.endpoint, stored.endpoint)
+    config.apiKey = pick(env.apiKey)
+    config.model = pick(env.model, stored.model)
+  }
+  config.missing = provider === 'local' ? [] : Object.keys(REQUIRED)
     .filter((key) => !config[key])
     .map((key) => REQUIRED[key])
   return config
 }
 
-export function buildRequest({ prompt, previousReply }, config) {
-  const state = { latest_user_message: clip(prompt, MAX_PROMPT_CHARS) }
+export function buildRequest({ prompt, previousReply, model }, config) {
+  const limits = CLIP[config.provider === 'local' ? 'local' : 'jev']
+  const state = { latest_user_message: clip(prompt, limits.prompt) }
   if (config.includeContext && previousReply) {
-    state.previous_assistant_reply = clip(previousReply, MAX_CONTEXT_CHARS)
+    state.previous_assistant_reply = clip(previousReply, limits.context)
   }
-  return { model: config.model, state, questions: { effort: EFFORT_QUESTION } }
+  // Effort levels are calibrated per model, so the classifier needs to know which one runs.
+  if (model) state.model = model
+  const question = config.provider === 'local' ? CATEGORY_QUESTION : EFFORT_QUESTION
+  return { model: config.model, state, questions: { effort: question } }
 }
 
 export function clamp(level, min, max) {
@@ -119,13 +226,35 @@ export function clamp(level, min, max) {
   return LEVELS[Math.min(Math.max(i, lo), hi)]
 }
 
+// The local model answers with category probabilities: sum them into levels through the
+// model's table, so the confidence is the probability of the level it picks.
+export function levelProbabilities(categoryProbabilities, model) {
+  const table = profileOf(model).table
+  const levels = Object.fromEntries(LEVELS.map((level) => [level, 0]))
+  for (const category of CATEGORIES) levels[table[category]] += categoryProbabilities?.[category] ?? 0
+  return levels
+}
+
+function decideLocal(answer, config, model) {
+  if (!takesEffort(model)) return { effort: null, reason: 'model takes no effort' }
+  const levels = levelProbabilities(answer.probabilities, model)
+  const level = LEVELS.reduce((best, l) => (levels[l] > levels[best] ? l : best), LEVELS[0])
+  const confidence = levels[level]
+  const category = answer.choice
+  // The model's default is what `default` keeps: the session's own effort stands.
+  if (level === profileOf(model).default) return { effort: null, choice: 'default', confidence, category, reason: 'default' }
+  if (confidence < config.minConfidence) return { effort: null, choice: level, confidence, category, reason: 'low confidence' }
+  return { effort: clamp(level, config.minEffort, config.maxEffort), choice: level, confidence, category, reason: 'jev' }
+}
+
 // Returns `{ effort, choice, confidence, reason }`. `effort` is null when the
 // session's own effort should stand.
-export function decide(response, config) {
+export function decide(response, config, model) {
   const answer = response?.answers?.effort
   if (!answer || answer.type !== 'choice' || typeof answer.choice !== 'string') {
-    return { effort: null, reason: 'Jev returned no effort answer' }
+    return { effort: null, reason: 'no effort answer' }
   }
+  if (config.provider === 'local') return decideLocal(answer, config, model)
   const { choice, confidence } = answer
   if (choice === 'default') return { effort: null, choice, confidence, reason: 'default' }
   if (!LEVELS.includes(choice)) return { effort: null, choice, confidence, reason: 'unknown choice ' + choice }
@@ -138,10 +267,10 @@ export function decide(response, config) {
 export function describe(decision) {
   const pct = typeof decision.confidence === 'number' ? ' · ' + Math.round(decision.confidence * 100) + '%' : ''
   if (decision.effort) {
-    const capped = decision.choice && decision.choice !== decision.effort ? ' (Jev said ' + decision.choice + ')' : ''
+    const capped = decision.choice && decision.choice !== decision.effort ? ' (picked ' + decision.choice + ')' : ''
     return 'effort ' + decision.effort + capped + pct
   }
   if (decision.reason === 'default') return 'effort default' + pct
-  if (decision.reason === 'low confidence') return 'effort default (Jev unsure: ' + decision.choice + pct + ')'
+  if (decision.reason === 'low confidence') return 'effort default (unsure: ' + decision.choice + pct + ')'
   return 'effort default (' + decision.reason + ')'
 }

@@ -16,6 +16,10 @@ type Setup = {
   fetch?: (e: { url: string; init?: { headers?: Record<string, string>; body?: string } }) => unknown
   // What Claude Code answers for prompt.submit; by default the prompt enters
   submit?: (e: { text: string }) => unknown
+  // The session's main model
+  model?: string
+  // Records what the mod stores, in place of mock.store
+  saved?: Record<string, unknown>
 }
 
 const ENV = {
@@ -25,12 +29,21 @@ const ENV = {
 }
 
 // Stubs everything the mod reaches, and records what the model request carried.
-function stub(on: any, { env = ENV, fetch, submit, clock = true }: Setup & { clock?: boolean }) {
+function stub(on: any, { env = ENV, fetch, submit, model = 'claude-opus-5-5', saved, clock = true }: Setup & { clock?: boolean }) {
   const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[] }
   if (clock) mock.clock(on)
   mock.env(on, env)
-  mock.store(on, {})
+  if (saved) {
+    on('store.get', ($: any, e: any) => ({ value: saved[e.key] }))
+    on('store.set', ($: any, e: any) => {
+      saved[e.key] = e.value
+      return { value: undefined }
+    })
+  } else {
+    mock.store(on, {})
+  }
   on('session.messages', () => ({ value: [{ role: 'assistant', text: 'Shall I refactor the parser?', toolUses: [] }] }))
+  on('session.model', () => ({ value: model }))
   on('ui.status', ($: any, e: any) => {
     seen.statuses.push(e.text)
     return { value: undefined }
@@ -82,7 +95,8 @@ test('the request goes to the configured endpoint with the key and model', async
   expect(req.body.model).toBe('jev-1.13-free')
   expect(req.body.state.latest_user_message).toBe('yes, do it')
   expect(req.body.state.previous_assistant_reply).toBe('Shall I refactor the parser?')
-  expect(Object.keys(req.body.questions.effort.criteria)).toEqual(['low', 'default', 'high', 'xhigh', 'max'])
+  expect(req.body.state.model).toBe('claude-opus-5-5')
+  expect(Object.keys(req.body.questions.effort.criteria)).toEqual(['low', 'medium', 'default', 'high', 'xhigh', 'max'])
 })
 
 test('"default" keeps the session effort', async ($, on) => {
@@ -140,14 +154,14 @@ test('with no environment Jev is not called, and the status names what to set', 
   await runTurn($, 'Refactor the parser')
   expect(seen.requests.length).toBe(0)
   expect(seen.efforts).toEqual(['medium'])
-  expect(seen.statuses).toContain('auto-effort: set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL')
+  expect(seen.statuses).toContain('auto-effort: run /auto-effort setup, or set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL')
 })
 
 test('there is no default endpoint or model', async ($, on) => {
   const seen = stub(on, { env: { AUTO_EFFORT_API_KEY: 'test-key' } })
   await runTurn($, 'Refactor the parser')
   expect(seen.requests.length).toBe(0)
-  expect(seen.statuses).toContain('auto-effort: set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_MODEL')
+  expect(seen.statuses).toContain('auto-effort: run /auto-effort setup, or set AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_MODEL')
 })
 
 test('OPENCODE_API_KEY is not read', async ($, on) => {
@@ -208,7 +222,7 @@ test("a dropped prompt's decision does not reach the next turn", async ($, on) =
 test('/auto-effort off stops the overrides', async ($, on) => {
   const seen = stub(on, {})
   const reply = await $.command.run({ command: 'auto-effort', args: 'off' })
-  expect(reply.text).toBe('Jev effort picker turned off.')
+  expect(reply.text).toBe('Effort picker turned off.')
   await runTurn($, 'Migrate the build to Vite')
   expect(seen.requests.length).toBe(0)
   expect(seen.efforts).toEqual(['medium'])
@@ -227,4 +241,138 @@ test('/auto-effort status lists unset variables', async ($, on) => {
   const reply = await $.command.run({ command: 'auto-effort', args: 'status' })
   expect(reply.text).toMatch(/Endpoint: unset · model unset/)
   expect(reply.text).toMatch(/Missing: AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL/)
+})
+
+// The local provider: our fine-tuned model in llama-server, asked the category question.
+
+function categoryReply(probabilities: Record<string, number>) {
+  const choice = Object.entries(probabilities).sort((a, b) => b[1] - a[1])[0][0]
+  const body = { model: 'auto-effort', answers: { effort: { type: 'choice', choice, probabilities, confidence: 0.5 } } }
+  return { status: 200, ok: true, headers: {}, text: JSON.stringify(body) }
+}
+
+const MODELS = { status: 200, ok: true, headers: {}, text: JSON.stringify({ data: [{ id: 'auto-effort' }] }) }
+const LOCAL_ENV = { AUTO_EFFORT_PROVIDER: 'local' }
+const MULTI_STEP = { trivial: 0.02, light: 0.03, ordinary: 0.1, multi_step: 0.8, hard: 0.04, exhaustive: 0.01 }
+
+function localFetch(probabilities: Record<string, number>) {
+  return (e: { url: string }) => ({ value: e.url.endsWith('/v1/models') ? MODELS : categoryReply(probabilities) })
+}
+
+test('the local model is asked the category question, and its answer is mapped for the model', async ($, on) => {
+  const seen = stub(on, { env: LOCAL_ENV, fetch: localFetch(MULTI_STEP) })
+  await runTurn($, 'Refactor the payment module and make the tests pass')
+  const [req] = seen.requests.filter((r) => r.url.endsWith('/v1/systemone'))
+  expect(req.url).toBe('http://127.0.0.1:8765/v1/systemone')
+  expect(Object.keys(req.body.questions.effort.criteria)).toEqual(['trivial', 'light', 'ordinary', 'multi_step', 'hard', 'exhaustive'])
+  // Opus 5.5 defaults to medium: verified multi-step work is raised to high.
+  expect(seen.efforts).toEqual(['high'])
+  expect(seen.statuses).toContain('effort high · 80%')
+})
+
+test("ordinary work on the local model keeps the model's default", async ($, on) => {
+  const seen = stub(on, {
+    env: LOCAL_ENV,
+    fetch: localFetch({ trivial: 0.05, light: 0.15, ordinary: 0.6, multi_step: 0.15, hard: 0.04, exhaustive: 0.01 }),
+  })
+  await runTurn($, 'Add a --verbose flag')
+  expect(seen.efforts).toEqual(['medium'])
+})
+
+test('the same answer means the default on a model whose default is high', async ($, on) => {
+  const seen = stub(on, { env: LOCAL_ENV, fetch: localFetch(MULTI_STEP), model: 'claude-sonnet-5-5' })
+  await runTurn($, 'Refactor the payment module and make the tests pass', { effort: 'high' })
+  expect(seen.efforts).toEqual(['high'])
+  expect(seen.statuses).toContain('effort default · 90%')
+})
+
+test('when llama-server is not running, the mod starts it and the prompt keeps its effort', async ($, on) => {
+  const spawned: string[][] = []
+  const seen = stub(on, {
+    env: LOCAL_ENV,
+    fetch: () => ({ value: { status: 502, ok: false, headers: {}, text: '' } }),
+  })
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  await runTurn($, 'Refactor the parser')
+  expect(spawned.length).toBe(1)
+  expect(spawned[0]).toEqual([
+    'llama-server', '-hf', 'arthur-fontaine/auto-effort-qwen3-1.7b-GGUF:Q8_0',
+    '--host', '127.0.0.1', '--port', '8765', '--alias', 'auto-effort', '-c', '8192', '-np', '2',
+  ])
+  expect(seen.efforts).toEqual(['medium'])
+})
+
+test('a local GGUF file is passed with -m', async ($, on) => {
+  const spawned: string[][] = []
+  stub(on, { env: { ...LOCAL_ENV, AUTO_EFFORT_LOCAL_MODEL: '/models/auto-effort-Q8_0.gguf' }, fetch: () => ({ deny: 'refused' }) })
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  await runTurn($, 'Refactor the parser')
+  expect(spawned[0].slice(0, 3)).toEqual(['llama-server', '-m', '/models/auto-effort-Q8_0.gguf'])
+})
+
+// The wizard. The engine answers $.ui.ask through the AskUserQuestion tool.
+function answer(on: any, labels: string[]) {
+  const queue = [...labels]
+  on('tool.call', { tool: 'AskUserQuestion' }, ($: any, e: any) => {
+    const label = queue.shift()
+    return { result: { questions: e.questions, answers: { [e.questions[0].question]: label } } }
+  })
+}
+
+test('/auto-effort setup saves a Jev preset, never a key', async ($, on) => {
+  const saved: Record<string, any> = {}
+  stub(on, { env: {}, saved })
+  answer(on, ['OpenCode Zen'])
+  const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
+  expect(saved.config).toEqual({ provider: 'jev', endpoint: 'https://opencode.ai/zen/v1/systemone', model: 'jev-1.13' })
+  expect(reply.text).toMatch(/set AUTO_EFFORT_API_KEY/)
+})
+
+test('/auto-effort setup refuses a llama-server without decision models', async ($, on) => {
+  stub(on, { env: {} })
+  on('process.run', () => ({ value: { exitCode: 0, stdout: 'version: 0.5.0 (build 11300, commit abc)', stderr: '' } }))
+  answer(on, ['Local model'])
+  const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
+  expect(reply.text).toMatch(/llama-server is build 11300; decision models need build 11361 or later/)
+})
+
+test('/auto-effort setup falls back to the unified llama CLI', async ($, on) => {
+  const spawned: string[][] = []
+  const saved: Record<string, any> = {}
+  stub(on, { env: {}, fetch: () => ({ deny: 'refused' }), saved })
+  on('process.run', ($: any, e: any) =>
+    e.argv[0] === 'llama'
+      ? { value: { exitCode: 0, stdout: 'version: 0.5.0-dev (build 11406, commit 8216c84)', stderr: '' } }
+      : { deny: 'not found' })
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  answer(on, ['Local model', 'Download and start'])
+  const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
+  expect(saved.config.llamaServer).toBe('llama')
+  expect(spawned[0].slice(0, 3)).toEqual(['llama', 'serve', '-hf'])
+  expect(reply.text).toMatch(/served by llama serve \(build 11406\)/)
+})
+
+test('/auto-effort setup downloads and starts the local model', async ($, on) => {
+  const spawned: string[][] = []
+  const saved: Record<string, any> = {}
+  stub(on, { env: {}, fetch: () => ({ deny: 'refused' }), saved })
+  on('process.run', () => ({ value: { exitCode: 0, stdout: 'version: 0.5.0-dev (build 11408, commit 9f12cd4)', stderr: '' } }))
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  answer(on, ['Local model', 'Download and start'])
+  const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
+  expect(saved.config.provider).toBe('local')
+  expect(spawned.length).toBe(1)
+  expect(reply.text).toMatch(/The first start downloads the model/)
 })

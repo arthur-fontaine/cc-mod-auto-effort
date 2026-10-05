@@ -1,5 +1,5 @@
 import { expect, test } from 'claude-code/testing'
-import { buildRequest, clamp, decide, DEFAULTS, resolveConfig } from '../hooks/policy.js'
+import { buildRequest, clamp, clip, decide, DEFAULTS, normalizeModel, resolveConfig } from '../hooks/policy.js'
 
 test('endpoint, key, and model come only from the environment', () => {
   const config = resolveConfig({ endpoint: 'https://env.example', apiKey: 'k', model: 'jev-from-env' })
@@ -40,4 +40,39 @@ test('malformed answers keep the session effort', () => {
   const config = resolveConfig({})
   expect(decide({}, config).effort).toBe(null)
   expect(decide({ answers: { effort: { type: 'choice', choice: 'turbo', confidence: 1 } } }, config).effort).toBe(null)
+})
+
+test('the environment wins over what setup stored, and a key is never read from the store', () => {
+  const config = resolveConfig({ endpoint: 'https://env.example', model: 'jev-env' }, { provider: 'jev', endpoint: 'https://stored.example', model: 'jev-stored', apiKey: 'stored-key' })
+  expect(config.endpoint).toBe('https://env.example')
+  expect(config.model).toBe('jev-env')
+  expect(config.apiKey).toBeUndefined()
+  expect(resolveConfig({}, { provider: 'jev', endpoint: 'https://stored.example', model: 'm' }).endpoint).toBe('https://stored.example')
+})
+
+test('the local provider needs no endpoint or key and clips like the training data', () => {
+  const config = resolveConfig({ provider: 'local' })
+  expect(config.missing).toEqual([])
+  expect(config.endpoint).toBe('http://127.0.0.1:8765/v1/systemone')
+  const body = buildRequest({ prompt: 'x'.repeat(5000), previousReply: 'y'.repeat(2000) }, config)
+  expect(Array.from(body.state.latest_user_message).length).toBe(3000 - 20 + '\n[… truncated …]\n'.length)
+  expect(Array.from(body.state.previous_assistant_reply).length).toBe(800 - 20 + '\n[… truncated …]\n'.length)
+})
+
+test('clip counts code points, as Python does', () => {
+  const text = '😀'.repeat(50)
+  expect(Array.from(clip(text, 40)).length).toBe(20 + '\n[… truncated …]\n'.length)
+})
+
+test('model names are normalized', () => {
+  expect(normalizeModel('claude-opus-5-5[1m]')).toBe('claude-opus-5-5')
+  expect(normalizeModel('us.anthropic.claude-opus-5-5-v1')).toBe('claude-opus-5-5')
+  expect(normalizeModel('opus')).toBe('claude-opus-5-5')
+})
+
+test('Haiku keeps its own effort on the local provider', () => {
+  const config = resolveConfig({ provider: 'local' })
+  const response = { answers: { effort: { type: 'choice', choice: 'hard', probabilities: { hard: 1 } } } }
+  expect(decide(response, config, 'claude-haiku-4-5').effort).toBe(null)
+  expect(decide(response, config, 'claude-opus-5-5').effort).toBe('xhigh')
 })

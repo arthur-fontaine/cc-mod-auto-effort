@@ -1,4 +1,4 @@
-// Sends sample prompts to the configured Jev endpoint with the mod's own
+// Sends sample prompts to the configured endpoint (Jev, or a running local model) with the mod's own
 // question and prints what the mod would decide. Reads the same environment
 // variables as the mod (AUTO_EFFORT_*), and a .env file.
 import { readFileSync } from 'node:fs'
@@ -15,6 +15,8 @@ try {
 
 const env = process.env
 const config = resolveConfig({
+  provider: env.AUTO_EFFORT_PROVIDER,
+  localPort: env.AUTO_EFFORT_LOCAL_PORT,
   apiKey: env.AUTO_EFFORT_API_KEY,
   endpoint: env.AUTO_EFFORT_ENDPOINT,
   model: env.AUTO_EFFORT_MODEL,
@@ -40,14 +42,17 @@ const SAMPLES = [
   ['Do a full security audit of the auth system. Leave nothing unchecked, cost does not matter, use maximum effort.', undefined, 'max'],
 ]
 
-console.log('Endpoint ' + config.endpoint + ' · model ' + config.model + '\n')
+// The Claude model the mod would report for the session; levels are calibrated per model.
+const MODEL = env.AUTO_EFFORT_EVAL_CLAUDE_MODEL || 'claude-opus-5-5'
+
+console.log('Endpoint ' + config.endpoint + ' · model ' + config.model + ' · for ' + MODEL + '\n')
 let tokens = 0
 for (const [prompt, previousReply, expected] of SAMPLES) {
   const started = Date.now()
   const response = await fetch(config.endpoint, {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + config.apiKey, 'Content-Type': 'application/json' },
-    body: JSON.stringify(buildRequest({ prompt, previousReply }, config)),
+    body: JSON.stringify(buildRequest({ prompt, previousReply, model: MODEL }, config)),
   })
   const ms = Date.now() - started
   const text = await response.text()
@@ -61,8 +66,11 @@ for (const [prompt, previousReply, expected] of SAMPLES) {
   const probs = Object.entries(answer.probabilities)
     .map(([k, v]) => k + ' ' + Math.round(v * 100))
     .join(', ')
-  console.log((answer.choice === expected ? '✓' : '·') + ' ' + prompt.slice(0, 70))
-  console.log('    expected ' + expected + ' · Jev ' + answer.choice + ' (' + probs + ') · ' + ms + 'ms')
-  console.log('    mod → ' + describe(decide(body, config)))
+  const decision = decide(body, config, MODEL)
+  // The local model answers a category; what it means as a level is the decision's choice.
+  const picked = decision.reason === 'default' ? 'default' : decision.choice ?? answer.choice
+  console.log((picked === expected ? '✓' : '·') + ' ' + prompt.slice(0, 70))
+  console.log('    expected ' + expected + ' · answer ' + answer.choice + ' (' + probs + ') · ' + ms + 'ms')
+  console.log('    mod → ' + describe(decision))
 }
 console.log('\n' + tokens + ' input tokens in total')

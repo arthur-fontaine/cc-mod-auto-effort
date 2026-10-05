@@ -3,6 +3,7 @@
     uv run python pipeline/report.py
 """
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ ROWS = [
 
 # pipeline/benchmark.py's contenders, as the mod would use them.
 BENCH = [
-    ("nisev", "**Nisev 1.7B** (this repo)"),
+    ("nisev", "**Nisev 1.7B**"),
     ("kev-4b", "Kev-4B"),
     ("clef-flash-cloud", "Clef-Flash 9B"),
     ("clef-cloud", "Clef 27B"),
@@ -39,8 +40,8 @@ def pct(x):
 
 
 def benchmark_table():
-    lines = ["| Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |",
-             "| :- | :- | :- | -: | -: | -: | -: |"]
+    lines = ["| Model | Runs | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |",
+             "| :- | :- | -: | -: | -: | -: |"]
     for name, label in BENCH:
         path = ROOT / "results" / f"bench-{name}.json"
         if not path.exists():
@@ -48,10 +49,11 @@ def benchmark_table():
         r = json.loads(path.read_text())
         b, lat = r["bench"], r["latency_ms"]
         if b["where"] == "local":
-            where, served = f"Local, {b['machine']}", f"{b['runtime']}, `{b['file']}` ({b['size_gb']:.1f} GB)"
+            quant = re.search(r"(Q\d_\w+?|BF16|F16)\.gguf$", b["file"], re.I)
+            runs = f"Local · llama.cpp · {quant.group(1) if quant else b['file']}, {b['size_gb']:.1f} GB"
         else:
-            where, served = "Cloud", f"{b['provider']}, network round trip included"
-        lines.append(f"| {label} | {where} | {served} | {pct(r['level_actual_model']['accuracy'])} "
+            runs = f"Cloud · {b['provider']}"
+        lines.append(f"| {label} | {runs} | {pct(r['level_actual_model']['accuracy'])} "
                      f"| {pct(r['level_as_claude-opus-5-5']['accuracy'])} "
                      f"| {pct(r['level_actual_model']['applied_accuracy'])} "
                      f"| {lat['p50']:.0f} / {lat['p95']:.0f} ms |")

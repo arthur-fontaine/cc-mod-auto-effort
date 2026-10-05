@@ -1,7 +1,7 @@
-// The local provider: the fine-tuned classifier served by llama.cpp's llama-server.
+// The Nisev provider: the fine-tuned classifier, served by llama.cpp.
 // Pure helpers; register.js does the calls ($ is only passed within a file).
 
-import { LOCAL } from './policy.js'
+import { NISEV } from './policy.js'
 
 // `llama` is llama.cpp's unified CLI, whose server is `llama serve`; it takes the same flags.
 export function serverCommand(binary) {
@@ -9,11 +9,11 @@ export function serverCommand(binary) {
 }
 
 export function serverArgs(config, binary) {
-  const source = /\.gguf$/i.test(config.localModel) ? ['-m', config.localModel] : ['-hf', config.localModel]
+  const source = /\.gguf$/i.test(config.nisevModel) ? ['-m', config.nisevModel] : ['-hf', config.nisevModel]
   return [
     ...serverCommand(binary), ...source,
-    '--host', '127.0.0.1', '--port', String(config.localPort),
-    '--alias', LOCAL.alias,
+    '--host', '127.0.0.1', '--port', String(config.nisevPort),
+    '--alias', NISEV.alias,
     // Prompts are at most about 1,300 tokens; two slots let two prompts run at once.
     '-c', '8192', '-np', '2',
   ]
@@ -35,7 +35,7 @@ export function parseServerOutput(text) {
 // True when /v1/models lists our alias, whoever started the server.
 export function servesOurModel(text) {
   try {
-    return (JSON.parse(text).data ?? []).some((m) => m.id === LOCAL.alias)
+    return (JSON.parse(text).data ?? []).some((m) => m.id === NISEV.alias)
   } catch {
     return false
   }

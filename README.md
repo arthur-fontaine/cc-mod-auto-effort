@@ -8,10 +8,13 @@ It works with two kinds of provider, through the same System One API:
 
 - **A Jev endpoint**, such as [OpenCode Zen](https://opencode.ai/docs/zen/) or
   [TypeSafe](https://docs.typesafe.ai/api), or any other server of the API.
-- **The local model**: a Qwen3-1.7B fine-tuned for this one question
-  ([`training/`](training/README.md)), run on your machine by
-  [llama.cpp](https://github.com/ggml-org/llama.cpp). It isn't bundled: setup downloads it
-  (about 1.9 GB) only if you choose it.
+- **[Nisev](https://huggingface.co/arthur-fontaine/nisev-1.7b-GGUF)**, our own decision
+  model: a Qwen3-1.7B fine-tuned for this one question ([`training/`](training/README.md)),
+  run on your machine by [llama.cpp](https://github.com/ggml-org/llama.cpp). It isn't
+  bundled: setup downloads it (about 1.9 GB) only if you choose it.
+
+Other decision models you run yourself, such as Kev or Clef-Flash in llama.cpp, work as a
+Jev endpoint at their local URL. See the [benchmark](#benchmark) for how they compare.
 
 There is no default provider, and the mod calls nothing until you pick one with
 `/auto-effort setup` or the environment variables.
@@ -31,7 +34,7 @@ it should change only for a clear reason. The mod follows that:
    to `high`).
    - A Jev endpoint gets one `choice` question with six options: `low`, `medium`, `default`,
      `high`, `xhigh`, and `max`. Each option's rubric is taken from the blog post.
-   - The local model gets the question it was trained on, which sorts the request into one
+   - Nisev gets the question it was trained on, which sorts the request into one
      of six kinds of task, from `trivial` to `exhaustive`. A table in
      [`hooks/policy.js`](hooks/policy.js) turns the kind into a level for the session's
      model: an ordinary request keeps the model's default, verified multi-step work gets
@@ -41,7 +44,7 @@ it should change only for a clear reason. The mod follows that:
    model's default, whenever any of these happens:
    - The pick is the model's default.
    - The pick's confidence is below `AUTO_EFFORT_MIN_CONFIDENCE`.
-   - The provider times out or errors, or the local model is still starting.
+   - The provider times out or errors, or Nisev is still starting.
    - No provider is set up.
    - The model takes no effort.
    - The request comes from a subagent.
@@ -50,7 +53,7 @@ it should change only for a clear reason. The mod follows that:
 
 The status line under the prompt shows the last decision, for example `effort high · 82%`.
 Each prompt waits for the provider before its turn starts. That is usually well under a
-second (about 140 ms for the local model on an M4 Pro, 600 ms for Jev), and never longer
+second (about 130 ms for Nisev on an M4 Pro, 600 ms for Jev), and never longer
 than `AUTO_EFFORT_TIMEOUT_MS`.
 
 ## Install
@@ -102,11 +105,11 @@ To develop against a local checkout, use
 
 Run `/auto-effort setup` and choose a provider:
 
-- **Local model**: the mod checks that llama.cpp build b11361 or later is installed, as
+- **Nisev (local)**: the mod checks that llama.cpp build b11361 or later is installed, as
   `llama-server` or as the unified `llama` CLI (`llama serve`), and asks before
   downloading. It then starts the server on `127.0.0.1:8765` and keeps it running for the
   session; it stops with the session. llama.cpp downloads the model on the first start and
-  caches it, and the status line shows the progress. Prompts keep the session's effort
+  caches it (about 3 minutes on a fast connection); the status line says when it's ready. Prompts keep the session's effort
   until the model is ready. Install llama.cpp from
   [its releases](https://github.com/ggml-org/llama.cpp/releases) or a package manager.
 - **OpenCode Zen** or **TypeSafe**: the mod saves the endpoint and model. Set the key as
@@ -119,13 +122,13 @@ it, so you can also configure the mod with them alone:
 
 | Variable | What it is |
 | :- | :- |
-| `AUTO_EFFORT_PROVIDER` | `local` or `jev`. Setting `AUTO_EFFORT_ENDPOINT` implies `jev`. |
+| `AUTO_EFFORT_PROVIDER` | `nisev` or `jev`. Setting `AUTO_EFFORT_ENDPOINT` implies `jev`. |
 | `AUTO_EFFORT_ENDPOINT` | Jev: the System One endpoint URL. Use `https://`, since the key is sent as a bearer token. |
 | `AUTO_EFFORT_API_KEY` | Jev: the key for that endpoint. Only ever read from the environment. |
 | `AUTO_EFFORT_MODEL` | Jev: the model name the endpoint expects |
-| `AUTO_EFFORT_LOCAL_MODEL` | Local: a Hugging Face `repo:quant` for llama.cpp's `-hf`, or the path to a `.gguf` file. Defaults to `arthur-fontaine/auto-effort-qwen3-1.7b-GGUF:Q8_0`. |
-| `AUTO_EFFORT_LOCAL_PORT` | Local: the port to serve on. Defaults to `8765`. If a server already answers there with the `auto-effort` model, the mod uses it instead of starting one. |
-| `AUTO_EFFORT_LLAMA_SERVER` | Local: the llama.cpp binary, `llama-server` or `llama`. Defaults to the first of the two on your `PATH`. |
+| `AUTO_EFFORT_NISEV_MODEL` | Nisev: a Hugging Face `repo:quant` for llama.cpp's `-hf`, or the path to a `.gguf` file. Defaults to `arthur-fontaine/nisev-1.7b-GGUF:Q8_0`. |
+| `AUTO_EFFORT_NISEV_PORT` | Nisev: the port to serve on. Defaults to `8765`. If a server already answers there with the `nisev` model, the mod uses it instead of starting one. |
+| `AUTO_EFFORT_LLAMA_SERVER` | Nisev: the llama.cpp binary, `llama-server` or `llama`. Defaults to the first of the two on your `PATH`. |
 | `AUTO_EFFORT_MIN_CONFIDENCE` | Below this confidence, from 0 to 1, the session's effort stands. Defaults to `0.5`. |
 | `AUTO_EFFORT_TIMEOUT_MS` | How long to wait for the provider. Defaults to `4000`. |
 | `AUTO_EFFORT_MIN_EFFORT` / `AUTO_EFFORT_MAX_EFFORT` | The range of levels the mod may pick, from `low`, `medium`, `high`, `xhigh`, `max`. Defaults to `low` / `xhigh`. |
@@ -161,15 +164,14 @@ session or run `/reload-plugins`.
 
 | Provider | Endpoint | Model | Key |
 | :- | :- | :- | :- |
-| Local model | started by the mod | `auto-effort` | none |
+| Nisev | started by the mod | `nisev` | none |
 | OpenCode Zen | `https://opencode.ai/zen/v1/systemone` | `jev-1.13` or `jev-1.13-free` | An OpenCode API key, see below |
 | TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | A key from <https://console.typesafe.ai/keys> |
+| Cloudflare Workers AI (Clef) | `https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef-flash` | `clef-flash` | A token with the Workers AI template |
 
-On 136 held-out turns from real sessions, the local model picks the right level more often
-than `jev-1.13` (65% against 60%, 74% against 70% on Opus 5.5) and answers in about 140 ms
-instead of 625 ms, with nothing leaving your machine. It needs about 2 GB of memory while
-the session runs. See [`training/`](training/README.md#results) for how it was built and
-measured.
+Nisev needs about 2 GB of memory while the session runs. To use another decision model
+in llama.cpp, start it yourself (`llama-server -hf ggml-org/Kev-4B-GGUF:Q8_0 --port 8080`,
+say) and choose **Other** with `http://127.0.0.1:8080/v1/systemone`.
 
 To get an OpenCode API key:
 
@@ -179,6 +181,43 @@ To get an OpenCode API key:
 3. On the service account, click **Add API Key** and set **Permissions** to
    **Inference only**. The expiry date is optional.
 4. Copy the key, since it is shown once, and set it as `AUTO_EFFORT_API_KEY`.
+
+## Benchmark
+
+How often each model picks the effort level that two Claude teachers (Sonnet 5.5 and Opus
+5.5) agreed on, with hindsight, for 136 held-out turns from 35 real coding sessions. Always
+keeping the model's default scores 52.9%. Each model got the request the mod sends it, one
+request at a time. The local runs all used the same llama.cpp on the same Mac; cloud
+latency includes the round trip from that Mac to the provider.
+
+| Model | Where | Served by | Level | Level, as Opus 5.5 | Mod applies right level | Latency p50 / p95 |
+| :- | :- | :- | -: | -: | -: | -: |
+| **Nisev 1.7B** (this repo) | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `nisev-1.7b-Q8_0.gguf` (1.8 GB) | 65.4% | 73.5% | 66.9% | 129 / 364 ms |
+| Kev-4B | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `Kev-4B-Q8_0.gguf` (4.5 GB) | 55.1% | 60.3% | 52.2% | 1750 / 3236 ms |
+| Clef-Flash 9B | Local, Apple M4 Pro, 24 GB | llama.cpp b11406, `Clef-Flash-Q4_K_M.gguf` (6.5 GB) | 44.1% | 57.4% | 51.5% | 3384 / 5459 ms |
+| Clef-Flash 9B | Cloud | Cloudflare Workers AI, network round trip included | 56.6% | 64.7% | 51.5% | 309 / 909 ms |
+| Jev 1.13 | Cloud | OpenCode Zen, network round trip included | 61.8% | 70.6% | 62.5% | 588 / 770 ms |
+
+- **Level**: the pick, for the Claude model that ran the turn.
+- **Level, as Opus 5.5**: the same turns, as if they ran on Opus 5.5, whose default is
+  `medium`.
+- **Mod applies right level**: what the mod ends up doing with its default confidence
+  threshold of 0.5: the pick when confident enough, otherwise the session's own effort.
+
+Notes:
+
+- Run locally, Clef-Flash's p95 is past the mod's default 4 s timeout, so some of its turns
+  would keep the session's effort. Its 4-bit file also scores well below the same model on
+  Workers AI (a 4-bit MLX copy scored about the same 45% earlier), so quantization seems to
+  cost Clef more than the others.
+- Kev and Clef-Flash report a confidence of 0.5 or more on at most 1% of turns (median
+  0.06 to 0.16), so with the default threshold the mod almost never applies their picks:
+  "applied" stays near the always-default 52.9%.
+- With 136 turns, gaps of a few points are within noise. Kev, Clef-Flash and Jev answer
+  zero-shot; Nisev was trained on this question, from the same kind of sessions.
+
+Rerun it with `uv run python pipeline/benchmark.py` in [`training/`](training/README.md),
+which also explains how Nisev was built.
 
 ## Commands
 
@@ -190,7 +229,7 @@ To get an OpenCode API key:
 
 ## Privacy
 
-With the local model, nothing leaves your machine except llama.cpp's one-time download of
+With Nisev, nothing leaves your machine except llama.cpp's one-time download of
 the model from Hugging Face.
 
 With a Jev endpoint, each prompt goes to that endpoint, along with up to 1,500 characters
@@ -208,12 +247,12 @@ pnpm eval        # sample prompts against the live provider, reading .env
 ```
 
 `pnpm eval` needs a Jev endpoint's three variables, in the environment or in a gitignored
-`.env` (see `.env.example`), or `AUTO_EFFORT_PROVIDER=local` with the local model already
-served on its port. It reports the session model as `claude-opus-5-5`; set
+`.env` (see `.env.example`), or `AUTO_EFFORT_PROVIDER=nisev` with Nisev already served on
+its port. It reports the session model as `claude-opus-5-5`; set
 `AUTO_EFFORT_EVAL_CLAUDE_MODEL` to try another.
 
 On 2026-10-03, `pnpm eval` against `jev-1.13` on OpenCode Zen matched the expected level
-on 6 of the 9 sample prompts, and so did the local model. Each Jev call took 0.4–1 s, and
+on 6 of the 9 sample prompts, and so did Nisev. Each Jev call took 0.4–1 s, and
 the whole run used about 7k input tokens (about $0.0003). `jev-1.13-free` returned
 `429 FreeUsageLimitError` at the time.
 

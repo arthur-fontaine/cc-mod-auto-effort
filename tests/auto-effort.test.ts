@@ -243,24 +243,24 @@ test('/auto-effort status lists unset variables', async ($, on) => {
   expect(reply.text).toMatch(/Missing: AUTO_EFFORT_ENDPOINT, AUTO_EFFORT_API_KEY, AUTO_EFFORT_MODEL/)
 })
 
-// The local provider: our fine-tuned model in llama-server, asked the category question.
+// The Nisev provider: our fine-tuned model in llama.cpp, asked the category question.
 
 function categoryReply(probabilities: Record<string, number>) {
   const choice = Object.entries(probabilities).sort((a, b) => b[1] - a[1])[0][0]
-  const body = { model: 'auto-effort', answers: { effort: { type: 'choice', choice, probabilities, confidence: 0.5 } } }
+  const body = { model: 'nisev', answers: { effort: { type: 'choice', choice, probabilities, confidence: 0.5 } } }
   return { status: 200, ok: true, headers: {}, text: JSON.stringify(body) }
 }
 
-const MODELS = { status: 200, ok: true, headers: {}, text: JSON.stringify({ data: [{ id: 'auto-effort' }] }) }
-const LOCAL_ENV = { AUTO_EFFORT_PROVIDER: 'local' }
+const MODELS = { status: 200, ok: true, headers: {}, text: JSON.stringify({ data: [{ id: 'nisev' }] }) }
+const NISEV_ENV = { AUTO_EFFORT_PROVIDER: 'nisev' }
 const MULTI_STEP = { trivial: 0.02, light: 0.03, ordinary: 0.1, multi_step: 0.8, hard: 0.04, exhaustive: 0.01 }
 
-function localFetch(probabilities: Record<string, number>) {
+function nisevFetch(probabilities: Record<string, number>) {
   return (e: { url: string }) => ({ value: e.url.endsWith('/v1/models') ? MODELS : categoryReply(probabilities) })
 }
 
-test('the local model is asked the category question, and its answer is mapped for the model', async ($, on) => {
-  const seen = stub(on, { env: LOCAL_ENV, fetch: localFetch(MULTI_STEP) })
+test('Nisev is asked the category question, and its answer is mapped for the model', async ($, on) => {
+  const seen = stub(on, { env: NISEV_ENV, fetch: nisevFetch(MULTI_STEP) })
   await runTurn($, 'Refactor the payment module and make the tests pass')
   const [req] = seen.requests.filter((r) => r.url.endsWith('/v1/systemone'))
   expect(req.url).toBe('http://127.0.0.1:8765/v1/systemone')
@@ -270,17 +270,17 @@ test('the local model is asked the category question, and its answer is mapped f
   expect(seen.statuses).toContain('effort high · 80%')
 })
 
-test("ordinary work on the local model keeps the model's default", async ($, on) => {
+test("ordinary work on Nisev keeps the model's default", async ($, on) => {
   const seen = stub(on, {
-    env: LOCAL_ENV,
-    fetch: localFetch({ trivial: 0.05, light: 0.15, ordinary: 0.6, multi_step: 0.15, hard: 0.04, exhaustive: 0.01 }),
+    env: NISEV_ENV,
+    fetch: nisevFetch({ trivial: 0.05, light: 0.15, ordinary: 0.6, multi_step: 0.15, hard: 0.04, exhaustive: 0.01 }),
   })
   await runTurn($, 'Add a --verbose flag')
   expect(seen.efforts).toEqual(['medium'])
 })
 
 test('the same answer means the default on a model whose default is high', async ($, on) => {
-  const seen = stub(on, { env: LOCAL_ENV, fetch: localFetch(MULTI_STEP), model: 'claude-sonnet-5-5' })
+  const seen = stub(on, { env: NISEV_ENV, fetch: nisevFetch(MULTI_STEP), model: 'claude-sonnet-5-5' })
   await runTurn($, 'Refactor the payment module and make the tests pass', { effort: 'high' })
   expect(seen.efforts).toEqual(['high'])
   expect(seen.statuses).toContain('effort default · 90%')
@@ -289,7 +289,7 @@ test('the same answer means the default on a model whose default is high', async
 test('when llama-server is not running, the mod starts it and the prompt keeps its effort', async ($, on) => {
   const spawned: string[][] = []
   const seen = stub(on, {
-    env: LOCAL_ENV,
+    env: NISEV_ENV,
     fetch: () => ({ value: { status: 502, ok: false, headers: {}, text: '' } }),
   })
   on('process.spawn', async function* ($: any, e: any) {
@@ -299,15 +299,15 @@ test('when llama-server is not running, the mod starts it and the prompt keeps i
   await runTurn($, 'Refactor the parser')
   expect(spawned.length).toBe(1)
   expect(spawned[0]).toEqual([
-    'llama-server', '-hf', 'arthur-fontaine/auto-effort-qwen3-1.7b-GGUF:Q8_0',
-    '--host', '127.0.0.1', '--port', '8765', '--alias', 'auto-effort', '-c', '8192', '-np', '2',
+    'llama-server', '-hf', 'arthur-fontaine/nisev-1.7b-GGUF:Q8_0',
+    '--host', '127.0.0.1', '--port', '8765', '--alias', 'nisev', '-c', '8192', '-np', '2',
   ])
   expect(seen.efforts).toEqual(['medium'])
 })
 
 test('a local GGUF file is passed with -m', async ($, on) => {
   const spawned: string[][] = []
-  stub(on, { env: { ...LOCAL_ENV, AUTO_EFFORT_LOCAL_MODEL: '/models/auto-effort-Q8_0.gguf' }, fetch: () => ({ deny: 'refused' }) })
+  stub(on, { env: { ...NISEV_ENV, AUTO_EFFORT_NISEV_MODEL: '/models/auto-effort-Q8_0.gguf' }, fetch: () => ({ deny: 'refused' }) })
   on('process.spawn', async function* ($: any, e: any) {
     spawned.push([...e.argv])
     return { code: 0, signal: null }
@@ -337,7 +337,7 @@ test('/auto-effort setup saves a Jev preset, never a key', async ($, on) => {
 test('/auto-effort setup refuses a llama-server without decision models', async ($, on) => {
   stub(on, { env: {} })
   on('process.run', () => ({ value: { exitCode: 0, stdout: 'version: 0.5.0 (build 11300, commit abc)', stderr: '' } }))
-  answer(on, ['Local model'])
+  answer(on, ['Nisev (local)'])
   const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
   expect(reply.text).toMatch(/llama-server is build 11300; decision models need build 11361 or later/)
 })
@@ -354,14 +354,14 @@ test('/auto-effort setup falls back to the unified llama CLI', async ($, on) => 
     spawned.push([...e.argv])
     return { code: 0, signal: null }
   })
-  answer(on, ['Local model', 'Download and start'])
+  answer(on, ['Nisev (local)', 'Download and start'])
   const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
   expect(saved.config.llamaServer).toBe('llama')
   expect(spawned[0].slice(0, 3)).toEqual(['llama', 'serve', '-hf'])
   expect(reply.text).toMatch(/served by llama serve \(build 11406\)/)
 })
 
-test('/auto-effort setup downloads and starts the local model', async ($, on) => {
+test('/auto-effort setup downloads and starts Nisev', async ($, on) => {
   const spawned: string[][] = []
   const saved: Record<string, any> = {}
   stub(on, { env: {}, fetch: () => ({ deny: 'refused' }), saved })
@@ -370,9 +370,9 @@ test('/auto-effort setup downloads and starts the local model', async ($, on) =>
     spawned.push([...e.argv])
     return { code: 0, signal: null }
   })
-  answer(on, ['Local model', 'Download and start'])
+  answer(on, ['Nisev (local)', 'Download and start'])
   const reply = await $.command.run({ command: 'auto-effort', args: 'setup' })
-  expect(saved.config.provider).toBe('local')
+  expect(saved.config.provider).toBe('nisev')
   expect(spawned.length).toBe(1)
   expect(reply.text).toMatch(/The first start downloads the model/)
 })

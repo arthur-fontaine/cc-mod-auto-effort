@@ -1,4 +1,4 @@
-// Sends sample prompts to the configured endpoint (Jev, or a running local model) with the mod's own
+// Sends sample prompts to the configured endpoint (a Jev endpoint, or Nisev already served) with the mod's own
 // question and prints what the mod would decide. Reads the same environment
 // variables as the mod (AUTO_EFFORT_*), and a .env file.
 import { readFileSync } from 'node:fs'
@@ -16,7 +16,7 @@ try {
 const env = process.env
 const config = resolveConfig({
   provider: env.AUTO_EFFORT_PROVIDER,
-  localPort: env.AUTO_EFFORT_LOCAL_PORT,
+  nisevPort: env.AUTO_EFFORT_NISEV_PORT,
   apiKey: env.AUTO_EFFORT_API_KEY,
   endpoint: env.AUTO_EFFORT_ENDPOINT,
   model: env.AUTO_EFFORT_MODEL,
@@ -67,7 +67,7 @@ for (const [prompt, previousReply, expected] of SAMPLES) {
     .map(([k, v]) => k + ' ' + Math.round(v * 100))
     .join(', ')
   const decision = decide(body, config, MODEL)
-  // The local model answers a category; what it means as a level is the decision's choice.
+  // Nisev answers a category; what it means as a level is the decision's choice.
   const picked = decision.reason === 'default' ? 'default' : decision.choice ?? answer.choice
   console.log((picked === expected ? '✓' : '·') + ' ' + prompt.slice(0, 70))
   console.log('    expected ' + expected + ' · answer ' + answer.choice + ' (' + probs + ') · ' + ms + 'ms')

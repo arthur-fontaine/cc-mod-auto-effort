@@ -50,8 +50,8 @@ test('the environment wins over what setup stored, and a key is never read from 
   expect(resolveConfig({}, { provider: 'jev', endpoint: 'https://stored.example', model: 'm' }).endpoint).toBe('https://stored.example')
 })
 
-test('the local provider needs no endpoint or key and clips like the training data', () => {
-  const config = resolveConfig({ provider: 'local' })
+test('the Nisev provider needs no endpoint or key and clips like the training data', () => {
+  const config = resolveConfig({ provider: 'nisev' })
   expect(config.missing).toEqual([])
   expect(config.endpoint).toBe('http://127.0.0.1:8765/v1/systemone')
   const body = buildRequest({ prompt: 'x'.repeat(5000), previousReply: 'y'.repeat(2000) }, config)
@@ -70,9 +70,15 @@ test('model names are normalized', () => {
   expect(normalizeModel('opus')).toBe('claude-opus-5-5')
 })
 
-test('Haiku keeps its own effort on the local provider', () => {
-  const config = resolveConfig({ provider: 'local' })
+test('Haiku keeps its own effort on the Nisev provider', () => {
+  const config = resolveConfig({ provider: 'nisev' })
   const response = { answers: { effort: { type: 'choice', choice: 'hard', probabilities: { hard: 1 } } } }
   expect(decide(response, config, 'claude-haiku-4-5').effort).toBe(null)
   expect(decide(response, config, 'claude-opus-5-5').effort).toBe('xhigh')
+})
+
+test("Cloudflare Workers AI's response, wrapped in result, is read like any other", () => {
+  const config = resolveConfig({ endpoint: 'https://api.cloudflare.com/x', apiKey: 'k', model: 'clef-flash' })
+  const answer = { type: 'choice', choice: 'high', confidence: 0.8 }
+  expect(decide({ result: { answers: { effort: answer } }, success: true }, config).effort).toBe('high')
 })

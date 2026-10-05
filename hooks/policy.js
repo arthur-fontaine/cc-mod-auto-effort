@@ -11,14 +11,14 @@ export const DEFAULTS = {
 }
 
 // The fine-tuned classifier, served by llama.cpp's llama-server as a decision model.
-export const LOCAL = {
+export const NISEV = {
   // A Hugging Face repo for `llama-server -hf`, or a path to a .gguf file.
-  model: 'arthur-fontaine/auto-effort-qwen3-1.7b-GGUF:Q8_0',
+  model: 'arthur-fontaine/nisev-1.7b-GGUF:Q8_0',
   sizeLabel: 'about 1.9 GB',
   port: 8765,
   // Tried in order when none is configured: the server binary, or the unified CLI (`llama serve`).
   servers: ['llama-server', 'llama'],
-  alias: 'auto-effort',
+  alias: 'nisev',
   // The first llama.cpp build with /v1/systemone (ggml-org/llama.cpp#29818).
   minBuild: 11361,
 }
@@ -69,7 +69,7 @@ export const EFFORT_QUESTION = {
   },
 }
 
-// The question the local model was trained on, word for word (training/pipeline/task.py): it
+// The question Nisev was trained on, word for word (training/pipeline/task.py): it
 // sizes the request, and the model's table below turns the size into a level.
 export const CATEGORIES = ['trivial', 'light', 'ordinary', 'multi_step', 'hard', 'exhaustive']
 export const CATEGORY_QUESTION = {
@@ -134,8 +134,8 @@ export function takesEffort(model) {
 // Keeps the request well under the classifier's context.
 const CLIP = {
   jev: { prompt: 6000, context: 1500 },
-  // What the local model was trained with (training/pipeline/task.py).
-  local: { prompt: 3000, context: 800 },
+  // What Nisev was trained with (training/pipeline/task.py).
+  nisev: { prompt: 3000, context: 800 },
 }
 
 // Counts code points, as the Python that built the training data does, so a long prompt is
@@ -180,7 +180,7 @@ export const REQUIRED = {
 // `/auto-effort setup` saved: never a key, and the environment wins over it.
 export function resolveConfig(env = {}, stored = {}) {
   const requested = pick(env.provider, stored.provider)
-  const provider = ['jev', 'local'].includes(requested) ? requested : env.endpoint ? 'jev' : undefined
+  const provider = ['jev', 'nisev'].includes(requested) ? requested : env.endpoint ? 'jev' : undefined
   const config = {
     provider,
     minConfidence: toNumber(pick(env.minConfidence), DEFAULTS.minConfidence),
@@ -188,34 +188,34 @@ export function resolveConfig(env = {}, stored = {}) {
     minEffort: toLevel(pick(env.minEffort), DEFAULTS.minEffort),
     maxEffort: toLevel(pick(env.maxEffort), DEFAULTS.maxEffort),
     includeContext: toBool(pick(env.includeContext), DEFAULTS.includeContext),
-    localModel: pick(env.localModel, stored.localModel, LOCAL.model),
-    localPort: toNumber(pick(env.localPort, stored.localPort), LOCAL.port),
+    nisevModel: pick(env.nisevModel, stored.nisevModel, NISEV.model),
+    nisevPort: toNumber(pick(env.nisevPort, stored.nisevPort), NISEV.port),
     llamaServer: pick(env.llamaServer, stored.llamaServer),
   }
-  if (provider === 'local') {
-    config.endpoint = `http://127.0.0.1:${config.localPort}/v1/systemone`
-    config.apiKey = 'local'
-    config.model = LOCAL.alias
+  if (provider === 'nisev') {
+    config.endpoint = `http://127.0.0.1:${config.nisevPort}/v1/systemone`
+    config.apiKey = 'none'
+    config.model = NISEV.alias
   } else {
     config.endpoint = pick(env.endpoint, stored.endpoint)
     config.apiKey = pick(env.apiKey)
     config.model = pick(env.model, stored.model)
   }
-  config.missing = provider === 'local' ? [] : Object.keys(REQUIRED)
+  config.missing = provider === 'nisev' ? [] : Object.keys(REQUIRED)
     .filter((key) => !config[key])
     .map((key) => REQUIRED[key])
   return config
 }
 
 export function buildRequest({ prompt, previousReply, model }, config) {
-  const limits = CLIP[config.provider === 'local' ? 'local' : 'jev']
+  const limits = CLIP[config.provider === 'nisev' ? 'nisev' : 'jev']
   const state = { latest_user_message: clip(prompt, limits.prompt) }
   if (config.includeContext && previousReply) {
     state.previous_assistant_reply = clip(previousReply, limits.context)
   }
   // Effort levels are calibrated per model, so the classifier needs to know which one runs.
   if (model) state.model = model
-  const question = config.provider === 'local' ? CATEGORY_QUESTION : EFFORT_QUESTION
+  const question = config.provider === 'nisev' ? CATEGORY_QUESTION : EFFORT_QUESTION
   return { model: config.model, state, questions: { effort: question } }
 }
 
@@ -226,7 +226,7 @@ export function clamp(level, min, max) {
   return LEVELS[Math.min(Math.max(i, lo), hi)]
 }
 
-// The local model answers with category probabilities: sum them into levels through the
+// Nisev answers with category probabilities: sum them into levels through the
 // model's table, so the confidence is the probability of the level it picks.
 export function levelProbabilities(categoryProbabilities, model) {
   const table = profileOf(model).table
@@ -235,7 +235,7 @@ export function levelProbabilities(categoryProbabilities, model) {
   return levels
 }
 
-function decideLocal(answer, config, model) {
+function decideNisev(answer, config, model) {
   if (!takesEffort(model)) return { effort: null, reason: 'model takes no effort' }
   const levels = levelProbabilities(answer.probabilities, model)
   const level = LEVELS.reduce((best, l) => (levels[l] > levels[best] ? l : best), LEVELS[0])
@@ -250,11 +250,12 @@ function decideLocal(answer, config, model) {
 // Returns `{ effort, choice, confidence, reason }`. `effort` is null when the
 // session's own effort should stand.
 export function decide(response, config, model) {
-  const answer = response?.answers?.effort
+  // Cloudflare Workers AI wraps the System One response in `result`.
+  const answer = (response?.answers ?? response?.result?.answers)?.effort
   if (!answer || answer.type !== 'choice' || typeof answer.choice !== 'string') {
     return { effort: null, reason: 'no effort answer' }
   }
-  if (config.provider === 'local') return decideLocal(answer, config, model)
+  if (config.provider === 'nisev') return decideNisev(answer, config, model)
   const { choice, confidence } = answer
   if (choice === 'default') return { effort: null, choice, confidence, reason: 'default' }
   if (!LEVELS.includes(choice)) return { effort: null, choice, confidence, reason: 'unknown choice ' + choice }

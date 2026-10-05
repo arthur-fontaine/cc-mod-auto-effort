@@ -1,5 +1,5 @@
-import { buildRequest, decide, describe, JEV_PRESETS, LEVELS, LOCAL, resolveConfig } from './policy.js'
-import { parseBuild, parseServerOutput, serverArgs, serverCommand, servesOurModel } from './local.js'
+import { buildRequest, decide, describe, JEV_PRESETS, LEVELS, NISEV, resolveConfig } from './policy.js'
+import { parseBuild, parseServerOutput, serverArgs, serverCommand, servesOurModel } from './nisev.js'
 
 const USER_ORIGINS = ['composer', 'bridge', 'sdk']
 
@@ -12,11 +12,11 @@ let lastDecision = null
 let warnedMissing = false
 // The llama-server this module started, if any: { state: starting | downloading | ready | stopped }.
 let server = null
-// Set once a request reached the local model, so a prompt doesn't probe the port every time.
-let localConfirmed = false
+// Set once a request reached Nisev, so a prompt doesn't probe the port every time.
+let nisevConfirmed = false
 
-function localState() {
-  return server && server.state !== 'stopped' ? server.state : localConfirmed ? 'ready' : 'stopped'
+function nisevState() {
+  return server && server.state !== 'stopped' ? server.state : nisevConfirmed ? 'ready' : 'stopped'
 }
 
 async function llamaServerBuild($, binary) {
@@ -30,16 +30,16 @@ async function llamaServerBuild($, binary) {
 
 // The configured binary, else the first of llama-server and llama that runs: { binary, build }.
 async function findServer($, config) {
-  for (const binary of config.llamaServer ? [config.llamaServer] : LOCAL.servers) {
+  for (const binary of config.llamaServer ? [config.llamaServer] : NISEV.servers) {
     const build = await llamaServerBuild($, binary)
     if (build !== null) return { binary, build }
   }
-  return { binary: config.llamaServer ?? LOCAL.servers[0], build: null }
+  return { binary: config.llamaServer ?? NISEV.servers[0], build: null }
 }
 
 async function isServing($, config) {
   try {
-    const response = await $.http.fetch(`http://127.0.0.1:${config.localPort}/v1/models`)
+    const response = await $.http.fetch(`http://127.0.0.1:${config.nisevPort}/v1/models`)
     return response.ok && servesOurModel(response.text)
   } catch {
     return false
@@ -48,15 +48,17 @@ async function isServing($, config) {
 
 // Starts llama-server for the rest of the session unless our model is already served on the
 // port; never waits. The first start downloads the model (-hf), reported on the status line.
-async function startLocal($, config) {
+async function startNisev($, config) {
   if (server && server.state !== 'stopped') return server.state
   if (await isServing($, config)) {
-    localConfirmed = true
+    nisevConfirmed = true
     return 'ready'
   }
   const current = { state: 'starting' }
   server = current
   const { binary } = await findServer($, config)
+  // llama.cpp may print nothing while it downloads, so say up front that the first start can take minutes.
+  $.ui.status('auto-effort: starting Nisev (the first start downloads ' + NISEV.sizeLabel + ')')
   void (async () => {
     try {
       // The loop is the child's life: it ends with the child or with this module.
@@ -64,8 +66,8 @@ async function startLocal($, config) {
         const seen = parseServerOutput(text)
         if (seen.ready && current.state !== 'ready') {
           current.state = 'ready'
-          localConfirmed = true
-          $.ui.status('auto-effort: local model ready')
+          nisevConfirmed = true
+          $.ui.status('auto-effort: Nisev ready')
         } else if (seen.percent !== undefined && current.state !== 'ready') {
           current.state = 'downloading'
           $.ui.status('auto-effort: downloading the model · ' + seen.percent + '%')
@@ -77,7 +79,7 @@ async function startLocal($, config) {
       $.ui.status('auto-effort: llama-server failed to start, see the debug log')
     }
     current.state = 'stopped'
-    localConfirmed = false
+    nisevConfirmed = false
   })()
   return current.state
 }
@@ -102,8 +104,8 @@ async function loadConfig($) {
     minEffort: await $.env.get('AUTO_EFFORT_MIN_EFFORT'),
     maxEffort: await $.env.get('AUTO_EFFORT_MAX_EFFORT'),
     includeContext: await $.env.get('AUTO_EFFORT_INCLUDE_CONTEXT'),
-    localModel: await $.env.get('AUTO_EFFORT_LOCAL_MODEL'),
-    localPort: await $.env.get('AUTO_EFFORT_LOCAL_PORT'),
+    nisevModel: await $.env.get('AUTO_EFFORT_NISEV_MODEL'),
+    nisevPort: await $.env.get('AUTO_EFFORT_NISEV_PORT'),
     llamaServer: await $.env.get('AUTO_EFFORT_LLAMA_SERVER'),
   }
   return resolveConfig(env, await storedConfig($))
@@ -140,8 +142,8 @@ async function askSystemOne($, config, body) {
   const timeout = $.clock.sleep(config.timeoutMs).then(() => null)
   const response = await Promise.race([request, timeout])
   if (response === null) throw new Error('timed out after ' + config.timeoutMs + 'ms')
-  if (response.status === 404 && config.provider === 'local') {
-    throw new Error('llama-server has no /v1/systemone; it needs build ' + LOCAL.minBuild + ' or later')
+  if (response.status === 404 && config.provider === 'nisev') {
+    throw new Error('llama-server has no /v1/systemone; it needs build ' + NISEV.minBuild + ' or later')
   }
   if (!response.ok) throw new Error('HTTP ' + response.status + ' ' + response.text.slice(0, 200))
   return JSON.parse(response.text)
@@ -163,21 +165,21 @@ async function classify($, prompt) {
     }
     return null
   }
-  if (config.provider === 'local' && localState() !== 'ready') {
+  if (config.provider === 'nisev' && nisevState() !== 'ready') {
     // Start it for the next prompts; this one keeps the session's effort.
-    const state = await startLocal($, config)
-    if (state !== 'ready') return { effort: null, reason: 'local model ' + state }
+    const state = await startNisev($, config)
+    if (state !== 'ready') return { effort: null, reason: 'Nisev ' + state }
   }
   const model = await sessionModel($)
   const body = buildRequest({ prompt, previousReply: await previousReply($), model }, config)
   try {
     const decision = decide(await askSystemOne($, config, body), config, model)
-    if (config.provider === 'local') localConfirmed = true
+    if (config.provider === 'nisev') nisevConfirmed = true
     return decision
   } catch (error) {
     $.ui.log('effort request failed: ' + error.message, { to: 'debug' })
-    if (config.provider === 'local') localConfirmed = false
-    return { effort: null, reason: config.provider === 'local' ? 'local model unavailable' : 'Jev unavailable' }
+    if (config.provider === 'nisev') nisevConfirmed = false
+    return { effort: null, reason: config.provider === 'nisev' ? 'Nisev unavailable' : 'Jev unavailable' }
   }
 }
 
@@ -213,39 +215,39 @@ async function setupJev($, endpoint, model) {
   }
 }
 
-async function setupLocal($) {
+async function setupNisev($) {
   const env = { llamaServer: await $.env.get('AUTO_EFFORT_LLAMA_SERVER') }
-  const config = resolveConfig(env, { ...(await storedConfig($)), provider: 'local' })
+  const config = resolveConfig(env, { ...(await storedConfig($)), provider: 'nisev' })
   const { binary, build } = await findServer($, config)
   if (build === null) {
     return {
       text:
-        'llama.cpp was not found. Install build ' + LOCAL.minBuild + ' or later, from ' +
+        'llama.cpp was not found. Install build ' + NISEV.minBuild + ' or later, from ' +
         'https://github.com/ggml-org/llama.cpp/releases, so that llama-server or llama is on your PATH, or ' +
         'set AUTO_EFFORT_LLAMA_SERVER to its path. Then run /auto-effort setup again.',
     }
   }
-  if (build < LOCAL.minBuild) {
+  if (build < NISEV.minBuild) {
     return {
       text:
-        binary + ' is build ' + build + '; decision models need build ' + LOCAL.minBuild + ' or later. ' +
+        binary + ' is build ' + build + '; decision models need build ' + NISEV.minBuild + ' or later. ' +
         'Update it from https://github.com/ggml-org/llama.cpp/releases and run /auto-effort setup again.',
     }
   }
   config.llamaServer = binary
   const serving = await isServing($, config)
   if (!serving) {
-    const go = await ask($, 'Download ' + config.localModel + ' (' + LOCAL.sizeLabel + ') and run it with llama-server?', {
+    const go = await ask($, 'Download ' + config.nisevModel + ' (' + NISEV.sizeLabel + ') and run it with llama.cpp?', {
       header: 'Download',
       options: ['Download and start', 'Cancel'],
     })
     if (go !== 'Download and start') return { text: 'Setup cancelled; nothing changed.' }
   }
-  await saveConfig($, { provider: 'local', localModel: config.localModel, localPort: config.localPort, llamaServer: config.llamaServer })
-  await startLocal($, config)
+  await saveConfig($, { provider: 'nisev', nisevModel: config.nisevModel, nisevPort: config.nisevPort, llamaServer: config.llamaServer })
+  await startNisev($, config)
   return {
     text: [
-      'Saved: the local model, served by ' + serverCommand(binary).join(' ') + ' (build ' + build + ') on port ' + config.localPort + '.',
+      'Saved: Nisev, served by ' + serverCommand(binary).join(' ') + ' (build ' + build + ') on port ' + config.nisevPort + '.',
       serving
         ? 'It is already running.'
         : 'The first start downloads the model; the status line shows the progress. Until it is ready, ' +
@@ -258,10 +260,10 @@ async function setupLocal($) {
 async function setup($) {
   const choice = await ask($, 'Which classifier should pick the effort of each prompt?', {
     header: 'Classifier',
-    options: ['Local model', ...Object.keys(JEV_PRESETS)],
+    options: ['Nisev (local)', ...Object.keys(JEV_PRESETS)],
   })
   if (choice === null) return { text: 'Setup cancelled; nothing changed.' }
-  if (choice === 'Local model') return setupLocal($)
+  if (choice === 'Nisev (local)') return setupNisev($)
   if (JEV_PRESETS[choice]) return setupJev($, JEV_PRESETS[choice].endpoint, JEV_PRESETS[choice].model)
   // "Other": any System One endpoint.
   if (!/^https?:\/\/\S+$/.test(choice.trim())) {
@@ -275,8 +277,8 @@ async function setup($) {
 async function status($) {
   const config = await loadConfig($)
   const lines = ['Effort picker: ' + (enabled ? 'on' : 'off')]
-  if (config.provider === 'local') {
-    lines.push('Provider: local model ' + config.localModel + ' · llama.cpp on port ' + config.localPort + ' (' + localState() + ')')
+  if (config.provider === 'nisev') {
+    lines.push('Provider: Nisev ' + config.nisevModel + ' · llama.cpp on port ' + config.nisevPort + ' (' + nisevState() + ')')
   } else {
     lines.push('Provider: ' + (config.provider ? 'Jev' : 'not set, run /auto-effort setup'))
     lines.push('Endpoint: ' + (config.endpoint ?? 'unset') + ' · model ' + (config.model ?? 'unset'))
@@ -310,9 +312,9 @@ export function register(on) {
       $.ui.log('could not register /auto-effort: ' + error.message, { to: 'debug' })
     }
     const result = await next(e)
-    // Warm the local model up before the first prompt needs it.
+    // Warm Nisev up before the first prompt needs it.
     const config = await loadConfig($)
-    if (enabled && config.provider === 'local') await startLocal($, config)
+    if (enabled && config.provider === 'nisev') await startNisev($, config)
     return result
   })
 

@@ -82,3 +82,26 @@ test("Cloudflare Workers AI's response, wrapped in result, is read like any othe
   const answer = { type: 'choice', choice: 'high', confidence: 0.8 }
   expect(decide({ result: { answers: { effort: answer } }, success: true }, config).effort).toBe('high')
 })
+
+test('an endpoint in the environment wins over a saved Nisev setup', () => {
+  const config = resolveConfig({ endpoint: 'https://opencode.ai/zen/v1/systemone' }, { provider: 'nisev' })
+  expect(config.provider).toBe('jev')
+})
+
+test('a saved cloud setup never leaks into Nisev', () => {
+  const stored = { provider: 'jev', endpoint: 'https://opencode.ai/zen/v1/systemone', model: 'jev-1.13' }
+  const config = resolveConfig({ provider: 'nisev' }, stored)
+  expect(config.model).toBe('arthur-fontaine/nisev-1.7b-GGUF:Q8_0')
+  expect(config.endpoint).toBe('http://127.0.0.1:8765/v1/systemone')
+  expect(config.port).toBe(8765)
+})
+
+test('Nisev needs a local endpoint, whose port it serves on', () => {
+  expect(resolveConfig({ provider: 'nisev', endpoint: 'http://127.0.0.1:9000/v1/systemone' }).port).toBe(9000)
+  expect(resolveConfig({ provider: 'nisev', endpoint: 'https://example.com/v1/systemone' }).missing.length).toBe(1)
+})
+
+test('Nisev is asked under its alias, whatever file llama.cpp serves', () => {
+  const config = resolveConfig({ provider: 'nisev', model: '/models/nisev.gguf' })
+  expect(buildRequest({ prompt: 'hi' }, config).model).toBe('nisev')
+})

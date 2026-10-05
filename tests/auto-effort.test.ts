@@ -307,13 +307,25 @@ test('when llama-server is not running, the mod starts it and the prompt keeps i
 
 test('a local GGUF file is passed with -m', async ($, on) => {
   const spawned: string[][] = []
-  stub(on, { env: { ...NISEV_ENV, AUTO_EFFORT_NISEV_MODEL: '/models/auto-effort-Q8_0.gguf' }, fetch: () => ({ deny: 'refused' }) })
+  stub(on, { env: { ...NISEV_ENV, AUTO_EFFORT_MODEL: '/models/auto-effort-Q8_0.gguf' }, fetch: () => ({ deny: 'refused' }) })
   on('process.spawn', async function* ($: any, e: any) {
     spawned.push([...e.argv])
     return { code: 0, signal: null }
   })
   await runTurn($, 'Refactor the parser')
   expect(spawned[0].slice(0, 3)).toEqual(['llama-server', '-m', '/models/auto-effort-Q8_0.gguf'])
+})
+
+test("Nisev's endpoint sets the port llama.cpp serves on", async ($, on) => {
+  const spawned: string[][] = []
+  const env = { ...NISEV_ENV, AUTO_EFFORT_ENDPOINT: 'http://127.0.0.1:9000/v1/systemone' }
+  stub(on, { env, fetch: () => ({ deny: 'refused' }) })
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  await runTurn($, 'Refactor the parser')
+  expect(spawned[0].slice(spawned[0].indexOf('--port'), spawned[0].indexOf('--port') + 2)).toEqual(['--port', '9000'])
 })
 
 // The wizard. The engine answers $.ui.ask through the AskUserQuestion tool.

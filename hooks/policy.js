@@ -15,7 +15,7 @@ export const NISEV = {
   // A Hugging Face repo for `llama-server -hf`, or a path to a .gguf file.
   model: 'arthur-fontaine/nisev-1.7b-GGUF:Q8_0',
   sizeLabel: 'about 1.9 GB',
-  port: 8765,
+  endpoint: 'http://127.0.0.1:8765/v1/systemone',
   // Tried in order when none is configured: the server binary, or the unified CLI (`llama serve`).
   servers: ['llama-server', 'llama'],
   alias: 'nisev',
@@ -178,9 +178,18 @@ export const REQUIRED = {
 
 // `env` holds the AUTO_EFFORT_* values, keyed as in the returned config. `stored` holds what
 // `/auto-effort setup` saved: never a key, and the environment wins over it.
+// The port Nisev serves on, from its endpoint; null unless the endpoint is on this machine.
+export function localPort(endpoint) {
+  const match = /^http:\/\/(?:127\.0\.0\.1|localhost):(\d+)\/v1\/systemone$/.exec(endpoint ?? '')
+  return match ? Number(match[1]) : null
+}
+
 export function resolveConfig(env = {}, stored = {}) {
-  const requested = pick(env.provider, stored.provider)
-  const provider = ['jev', 'nisev'].includes(requested) ? requested : env.endpoint ? 'jev' : undefined
+  // The environment wins: an endpoint there means a cloud endpoint unless AUTO_EFFORT_PROVIDER says otherwise.
+  const provider = [env.provider, env.endpoint && 'jev', stored.provider].find((p) => ['jev', 'nisev'].includes(p))
+  // Saved values belong to the provider they were saved for: a cloud model name is no GGUF to serve.
+  const saved = stored.provider === provider ? stored : {}
+  const nisev = provider === 'nisev'
   const config = {
     provider,
     minConfidence: toNumber(pick(env.minConfidence), DEFAULTS.minConfidence),
@@ -188,22 +197,18 @@ export function resolveConfig(env = {}, stored = {}) {
     minEffort: toLevel(pick(env.minEffort), DEFAULTS.minEffort),
     maxEffort: toLevel(pick(env.maxEffort), DEFAULTS.maxEffort),
     includeContext: toBool(pick(env.includeContext), DEFAULTS.includeContext),
-    nisevModel: pick(env.nisevModel, stored.nisevModel, NISEV.model),
-    nisevPort: toNumber(pick(env.nisevPort, stored.nisevPort), NISEV.port),
-    llamaServer: pick(env.llamaServer, stored.llamaServer),
+    // For Nisev, the model is what llama.cpp serves: a Hugging Face repo:quant or a .gguf path.
+    endpoint: pick(env.endpoint, saved.endpoint, nisev ? NISEV.endpoint : undefined),
+    model: pick(env.model, saved.model, nisev ? NISEV.model : undefined),
+    apiKey: nisev ? 'none' : pick(env.apiKey),
+    llamaServer: nisev ? pick(env.llamaServer, saved.llamaServer) : undefined,
   }
-  if (provider === 'nisev') {
-    config.endpoint = `http://127.0.0.1:${config.nisevPort}/v1/systemone`
-    config.apiKey = 'none'
-    config.model = NISEV.alias
+  if (nisev) {
+    config.port = localPort(config.endpoint)
+    config.missing = config.port ? [] : ['AUTO_EFFORT_ENDPOINT (for Nisev, a local URL such as ' + NISEV.endpoint + ')']
   } else {
-    config.endpoint = pick(env.endpoint, stored.endpoint)
-    config.apiKey = pick(env.apiKey)
-    config.model = pick(env.model, stored.model)
+    config.missing = Object.keys(REQUIRED).filter((key) => !config[key]).map((key) => REQUIRED[key])
   }
-  config.missing = provider === 'nisev' ? [] : Object.keys(REQUIRED)
-    .filter((key) => !config[key])
-    .map((key) => REQUIRED[key])
   return config
 }
 
@@ -216,7 +221,8 @@ export function buildRequest({ prompt, previousReply, model }, config) {
   // Effort levels are calibrated per model, so the classifier needs to know which one runs.
   if (model) state.model = model
   const question = config.provider === 'nisev' ? CATEGORY_QUESTION : EFFORT_QUESTION
-  return { model: config.model, state, questions: { effort: question } }
+  // llama.cpp answers to the alias it serves Nisev under, whatever file it loaded.
+  return { model: config.provider === 'nisev' ? NISEV.alias : config.model, state, questions: { effort: question } }
 }
 
 export function clamp(level, min, max) {

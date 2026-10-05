@@ -39,7 +39,7 @@ async function findServer($, config) {
 
 async function isServing($, config) {
   try {
-    const response = await $.http.fetch(`http://127.0.0.1:${config.nisevPort}/v1/models`)
+    const response = await $.http.fetch(`http://127.0.0.1:${config.port}/v1/models`)
     return response.ok && servesOurModel(response.text)
   } catch {
     return false
@@ -104,8 +104,6 @@ async function loadConfig($) {
     minEffort: await $.env.get('AUTO_EFFORT_MIN_EFFORT'),
     maxEffort: await $.env.get('AUTO_EFFORT_MAX_EFFORT'),
     includeContext: await $.env.get('AUTO_EFFORT_INCLUDE_CONTEXT'),
-    nisevModel: await $.env.get('AUTO_EFFORT_NISEV_MODEL'),
-    nisevPort: await $.env.get('AUTO_EFFORT_NISEV_PORT'),
     llamaServer: await $.env.get('AUTO_EFFORT_LLAMA_SERVER'),
   }
   return resolveConfig(env, await storedConfig($))
@@ -179,7 +177,7 @@ async function classify($, prompt) {
   } catch (error) {
     $.ui.log('effort request failed: ' + error.message, { to: 'debug' })
     if (config.provider === 'nisev') nisevConfirmed = false
-    return { effort: null, reason: config.provider === 'nisev' ? 'Nisev unavailable' : 'Jev unavailable' }
+    return { effort: null, reason: config.provider === 'nisev' ? 'Nisev unavailable' : 'endpoint unavailable' }
   }
 }
 
@@ -205,7 +203,7 @@ async function setupJev($, endpoint, model) {
   const key = await $.env.get('AUTO_EFFORT_API_KEY')
   return {
     text: [
-      saved ? 'Saved: Jev at ' + endpoint + ', model ' + model + '.' : 'Could not save the setting for later sessions.',
+      saved ? 'Saved: ' + endpoint + ', model ' + model + '.' : 'Could not save the setting for later sessions.',
       key
         ? 'AUTO_EFFORT_API_KEY is set, so the next prompt uses it.'
         : 'Now set AUTO_EFFORT_API_KEY to the key for that endpoint, in your shell or in the env block of a ' +
@@ -216,8 +214,8 @@ async function setupJev($, endpoint, model) {
 }
 
 async function setupNisev($) {
-  const env = { llamaServer: await $.env.get('AUTO_EFFORT_LLAMA_SERVER') }
-  const config = resolveConfig(env, { ...(await storedConfig($)), provider: 'nisev' })
+  const env = { provider: 'nisev', llamaServer: await $.env.get('AUTO_EFFORT_LLAMA_SERVER') }
+  const config = resolveConfig(env, await storedConfig($))
   const { binary, build } = await findServer($, config)
   if (build === null) {
     return {
@@ -237,22 +235,23 @@ async function setupNisev($) {
   config.llamaServer = binary
   const serving = await isServing($, config)
   if (!serving) {
-    const go = await ask($, 'Download ' + config.nisevModel + ' (' + NISEV.sizeLabel + ') and run it with llama.cpp?', {
+    const go = await ask($, 'Download ' + config.model + ' (' + NISEV.sizeLabel + ') and run it with llama.cpp?', {
       header: 'Download',
       options: ['Download and start', 'Cancel'],
     })
     if (go !== 'Download and start') return { text: 'Setup cancelled; nothing changed.' }
   }
-  await saveConfig($, { provider: 'nisev', nisevModel: config.nisevModel, nisevPort: config.nisevPort, llamaServer: config.llamaServer })
+  await saveConfig($, { provider: 'nisev', model: config.model, endpoint: config.endpoint, llamaServer: config.llamaServer })
   await startNisev($, config)
   return {
     text: [
-      'Saved: Nisev, served by ' + serverCommand(binary).join(' ') + ' (build ' + build + ') on port ' + config.nisevPort + '.',
+      'Saved: Nisev, served by ' + serverCommand(binary).join(' ') + ' (build ' + build + ') at ' + config.endpoint + '.',
       serving
         ? 'It is already running.'
         : 'The first start downloads the model; the status line shows the progress. Until it is ready, ' +
           'prompts keep the session effort.',
       'llama-server runs while this session does; the next session starts it again from the cache.',
+      'AUTO_EFFORT_* environment variables, when set, take precedence over this setup.',
     ].join('\n'),
   }
 }
@@ -278,9 +277,10 @@ async function status($) {
   const config = await loadConfig($)
   const lines = ['Effort picker: ' + (enabled ? 'on' : 'off')]
   if (config.provider === 'nisev') {
-    lines.push('Provider: Nisev ' + config.nisevModel + ' · llama.cpp on port ' + config.nisevPort + ' (' + nisevState() + ')')
+    lines.push('Provider: Nisev ' + config.model + ' · llama.cpp at ' + config.endpoint + ' (' + nisevState() + ')')
+    if (config.missing.length) lines.push('Missing: ' + config.missing.join(', '))
   } else {
-    lines.push('Provider: ' + (config.provider ? 'Jev' : 'not set, run /auto-effort setup'))
+    lines.push('Provider: ' + (config.provider ? 'System One endpoint' : 'not set, run /auto-effort setup'))
     lines.push('Endpoint: ' + (config.endpoint ?? 'unset') + ' · model ' + (config.model ?? 'unset'))
     lines.push('API key: ' + (config.apiKey ? 'set' : 'unset'))
     if (config.missing.length) lines.push('Missing: ' + config.missing.join(', '))

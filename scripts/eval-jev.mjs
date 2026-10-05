@@ -16,7 +16,6 @@ try {
 const env = process.env
 const config = resolveConfig({
   provider: env.AUTO_EFFORT_PROVIDER,
-  nisevPort: env.AUTO_EFFORT_NISEV_PORT,
   apiKey: env.AUTO_EFFORT_API_KEY,
   endpoint: env.AUTO_EFFORT_ENDPOINT,
   model: env.AUTO_EFFORT_MODEL,

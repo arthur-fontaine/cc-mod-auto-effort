@@ -171,23 +171,17 @@ run `/reload-plugins`.
 
 **Provider**
 
-| Variable | What it is |
-| :- | :- |
-| `AUTO_EFFORT_PROVIDER` | `nisev`, or `jev` for any System One endpoint (Jev, Clef…). Setting `AUTO_EFFORT_ENDPOINT` implies `jev`. |
-| `AUTO_EFFORT_ENDPOINT` | The System One URL. Use `https://`: the key is sent as a bearer token. |
-| `AUTO_EFFORT_API_KEY` | The endpoint's key. Only ever read from the environment. |
-| `AUTO_EFFORT_MODEL` | The model name the endpoint expects. |
-
-While a cloud endpoint lacks one of these, the mod changes nothing, and the status line and
-`/auto-effort` say what's missing.
-
-**Nisev**
-
-| Variable | Default | What it is |
+| Variable | With a cloud endpoint | With Nisev |
 | :- | :- | :- |
-| `AUTO_EFFORT_NISEV_MODEL` | `arthur-fontaine/nisev-1.7b-GGUF:Q8_0` | A Hugging Face `repo:quant`, or a `.gguf` path. |
-| `AUTO_EFFORT_NISEV_PORT` | `8765` | If a server there already serves `nisev`, the mod uses it. |
-| `AUTO_EFFORT_LLAMA_SERVER` | first on your `PATH` | `llama-server` or `llama`. |
+| `AUTO_EFFORT_PROVIDER` | `jev`, for any System One endpoint (Jev, Clef…). Implied by `AUTO_EFFORT_ENDPOINT`. | `nisev` |
+| `AUTO_EFFORT_ENDPOINT` | The System One URL. Use `https://`: the key is sent as a bearer token. | The local URL to serve it at. Defaults to `http://127.0.0.1:8765/v1/systemone`; if Nisev already answers there, the mod uses that server. |
+| `AUTO_EFFORT_MODEL` | The model name the endpoint expects. | The model llama.cpp serves: a Hugging Face `repo:quant` or a `.gguf` path. Defaults to `arthur-fontaine/nisev-1.7b-GGUF:Q8_0`. |
+| `AUTO_EFFORT_API_KEY` | The endpoint's key. Only ever read from the environment. | Not used. |
+| `AUTO_EFFORT_LLAMA_SERVER` | Not used. | The llama.cpp binary, `llama-server` or `llama`. Defaults to the first on your `PATH`. |
+
+What setup saved applies only to the provider it was saved for. While a cloud endpoint
+lacks its endpoint, key or model, the mod changes nothing, and the status line and
+`/auto-effort` say what's missing.
 
 **Behavior**
 

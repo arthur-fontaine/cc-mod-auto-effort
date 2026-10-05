@@ -9,10 +9,10 @@ export function serverCommand(binary) {
 }
 
 export function serverArgs(config, binary) {
-  const source = /\.gguf$/i.test(config.nisevModel) ? ['-m', config.nisevModel] : ['-hf', config.nisevModel]
+  const source = /\.gguf$/i.test(config.model) ? ['-m', config.model] : ['-hf', config.model]
   return [
     ...serverCommand(binary), ...source,
-    '--host', '127.0.0.1', '--port', String(config.nisevPort),
+    '--host', '127.0.0.1', '--port', String(config.port),
     '--alias', NISEV.alias,
     // Prompts are at most about 1,300 tokens; two slots let two prompts run at once.
     '-c', '8192', '-np', '2',

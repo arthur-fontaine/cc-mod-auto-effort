@@ -91,8 +91,10 @@ cloud models it depends on the provider. Details in the [benchmark](#benchmark).
 
 Any provider that serves the System One API works. Setup has **OpenCode Zen** and
 **TypeSafe** built in; for any other, choose **Other** and enter its endpoint and model.
-Some that work: Then set the provider's key as `AUTO_EFFORT_API_KEY`
-([where](#environment-variables)). The mod never stores it.
+Then set the provider's key as `AUTO_EFFORT_API_KEY` ([where](#environment-variables)).
+The mod never stores it.
+
+Some providers that work:
 
 | Provider | Endpoint | Model |
 | :- | :- | :- |
@@ -100,22 +102,6 @@ Some that work: Then set the provider's key as `AUTO_EFFORT_API_KEY`
 | TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` |
 | OpenRouter | `https://openrouter.ai/api/v1/systemone` | `typesafe/jev-1.13` |
 | Cloudflare Workers AI | see below | `clef` or `clef-flash` |
-
-For Cloudflare, use this URL, with `clef` or `clef-flash` at the end, and a token made from
-the Workers AI template:
-
-```
-https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef
-```
-
-Another decision model you run yourself works the same way. For example, start
-`llama-server -hf ggml-org/Kev-4B-GGUF:Q8_0 --port 8080` and choose **Other** with
-`http://127.0.0.1:8080/v1/systemone`.
-
-**Privacy**: each prompt goes to the endpoint, truncated to 6,000 characters, with up to
-1,500 characters of Claude's previous reply and the session's model name. Set
-`AUTO_EFFORT_INCLUDE_CONTEXT=false` to send the prompt alone. Your provider's data policy
-applies; OpenCode says Jev inputs aren't used for training.
 
 <details>
 <summary>Get an OpenCode API key</summary>
@@ -128,6 +114,32 @@ applies; OpenCode says Jev inputs aren't used for training.
 4. Copy the key, since it is shown once, and set it as `AUTO_EFFORT_API_KEY`.
 
 </details>
+
+<details>
+<summary>Use Clef on Cloudflare Workers AI</summary>
+
+1. In the [Cloudflare dashboard](https://dash.cloudflare.com/profile/api-tokens), open
+   **My Profile** > **API Tokens** and click **Create Token**.
+2. Use the **Workers AI** template. Set a **TTL** if you want the token to expire.
+3. Copy the token, since it is shown once, and set it as `AUTO_EFFORT_API_KEY`.
+4. Find your account ID in the dashboard's URL: `dash.cloudflare.com/<account id>/…`.
+5. In `/auto-effort setup`, choose **Other**, enter this URL, then `clef` or `clef-flash`
+   as the model, matching the end of the URL:
+
+   ```
+   https://api.cloudflare.com/client/v4/accounts/<account id>/ai/run/@cf/cloudflare/clef
+   ```
+
+</details>
+
+A decision model you run yourself works the same way. For example, start
+`llama-server -hf ggml-org/Kev-4B-GGUF:Q8_0 --port 8080` and choose **Other** with
+`http://127.0.0.1:8080/v1/systemone`.
+
+**Privacy**: each prompt goes to the endpoint, truncated to 6,000 characters, with up to
+1,500 characters of Claude's previous reply and the session's model name. Set
+`AUTO_EFFORT_INCLUDE_CONTEXT=false` to send the prompt alone. Your provider's data policy
+applies; OpenCode says Jev inputs aren't used for training.
 
 ## Commands
 

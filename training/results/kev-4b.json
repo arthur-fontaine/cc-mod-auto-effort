@@ -1,0 +1,109 @@
+{
+ "name": "kev-4b",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9191176470588235,
+  "macro_f1": 0.36397727272727276,
+  "confusion": {
+   "low": {
+    "medium": 5,
+    "high": 11,
+    "low": 5
+   },
+   "medium": {
+    "high": 25,
+    "medium": 6,
+    "low": 2
+   },
+   "high": {
+    "high": 63,
+    "medium": 6,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 4,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.22058823529411764,
+  "move_precision": 0.7666666666666667,
+  "applied_accuracy": 0.5220588235294118,
+  "applied_within_one": 0.8529411764705882
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.6029411764705882,
+  "within_one": 0.9558823529411765,
+  "macro_f1": 0.38128654970760234,
+  "confusion": {
+   "low": {
+    "medium": 16,
+    "low": 5
+   },
+   "medium": {
+    "medium": 71,
+    "high": 2,
+    "low": 2
+   },
+   "high": {
+    "medium": 22,
+    "high": 5,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "medium": 6,
+    "max": 4,
+    "high": 1,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6470588235294118,
+  "moves": 0.15441176470588236,
+  "move_precision": 0.8095238095238095,
+  "applied_accuracy": 0.5588235294117647,
+  "applied_within_one": 0.9117647058823529
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9191176470588235,
+  "macro_f1": 0.36397727272727276,
+  "confusion": {
+   "low": {
+    "medium": 5,
+    "high": 11,
+    "low": 5
+   },
+   "medium": {
+    "high": 25,
+    "medium": 6,
+    "low": 2
+   },
+   "high": {
+    "high": 63,
+    "medium": 6,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 4,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.22058823529411764,
+  "move_precision": 0.7666666666666667,
+  "applied_accuracy": 0.5220588235294118,
+  "applied_within_one": 0.8529411764705882
+ },
+ "latency_ms": {
+  "p50": 858.1681250070687,
+  "p95": 1526.9133340043481,
+  "max": 8259.872916998575
+ }
+}

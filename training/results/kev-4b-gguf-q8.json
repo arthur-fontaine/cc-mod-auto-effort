@@ -1,0 +1,106 @@
+{
+ "name": "kev-4b-gguf-q8",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5294117647058824,
+  "within_one": 0.8602941176470589,
+  "macro_f1": 0.291132793323515,
+  "confusion": {
+   "low": {
+    "medium": 1,
+    "high": 18,
+    "low": 2
+   },
+   "medium": {
+    "high": 32,
+    "medium": 1
+   },
+   "high": {
+    "high": 67,
+    "low": 1,
+    "xhigh": 2
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 3,
+    "xhigh": 2
+   }
+  },
+  "direction_accuracy": 0.5588235294117647,
+  "moves": 0.08823529411764706,
+  "move_precision": 0.75,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.5808823529411765,
+  "within_one": 0.9411764705882353,
+  "macro_f1": 0.32069585448392557,
+  "confusion": {
+   "low": {
+    "medium": 19,
+    "low": 2
+   },
+   "medium": {
+    "medium": 73,
+    "high": 2
+   },
+   "high": {
+    "medium": 23,
+    "high": 2,
+    "low": 1,
+    "xhigh": 2
+   },
+   "xhigh": {
+    "medium": 7,
+    "max": 3,
+    "xhigh": 2
+   }
+  },
+  "direction_accuracy": 0.6176470588235294,
+  "moves": 0.10294117647058823,
+  "move_precision": 0.7857142857142857,
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9191176470588235
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5294117647058824,
+  "within_one": 0.8602941176470589,
+  "macro_f1": 0.291132793323515,
+  "confusion": {
+   "low": {
+    "medium": 1,
+    "high": 18,
+    "low": 2
+   },
+   "medium": {
+    "high": 32,
+    "medium": 1
+   },
+   "high": {
+    "high": 67,
+    "low": 1,
+    "xhigh": 2
+   },
+   "xhigh": {
+    "high": 7,
+    "max": 3,
+    "xhigh": 2
+   }
+  },
+  "direction_accuracy": 0.5588235294117647,
+  "moves": 0.08823529411764706,
+  "move_precision": 0.75,
+  "applied_accuracy": 0.5147058823529411,
+  "applied_within_one": 0.8455882352941176
+ },
+ "latency_ms": {
+  "p50": 3542.328916999395,
+  "p95": 3892.7240839984734,
+  "max": 4191.181791000417
+ }
+}

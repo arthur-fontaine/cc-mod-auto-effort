@@ -1,0 +1,111 @@
+{
+ "name": "clef-flash-4bit",
+ "split": "test",
+ "n": 136,
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.4485294117647059,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.3900813384308117,
+  "confusion": {
+   "low": {
+    "low": 7,
+    "medium": 11,
+    "high": 3
+   },
+   "medium": {
+    "high": 8,
+    "medium": 22,
+    "low": 3
+   },
+   "high": {
+    "high": 31,
+    "medium": 36,
+    "xhigh": 1,
+    "max": 2
+   },
+   "xhigh": {
+    "high": 4,
+    "max": 7,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6029411764705882,
+  "moves": 0.6617647058823529,
+  "move_precision": 0.5666666666666667,
+  "applied_accuracy": 0.5882352941176471,
+  "applied_within_one": 0.8602941176470589
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.6102941176470589,
+  "within_one": 0.9852941176470589,
+  "macro_f1": 0.4429660201549602,
+  "confusion": {
+   "low": {
+    "low": 7,
+    "medium": 14
+   },
+   "medium": {
+    "medium": 65,
+    "high": 7,
+    "low": 3
+   },
+   "high": {
+    "high": 10,
+    "medium": 15,
+    "xhigh": 1,
+    "max": 2
+   },
+   "xhigh": {
+    "high": 4,
+    "max": 7,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.7132352941176471,
+  "moves": 0.3088235294117647,
+  "move_precision": 0.7619047619047619,
+  "applied_accuracy": 0.5661764705882353,
+  "applied_within_one": 0.9338235294117647
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.4485294117647059,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.3900813384308117,
+  "confusion": {
+   "low": {
+    "low": 7,
+    "medium": 11,
+    "high": 3
+   },
+   "medium": {
+    "high": 8,
+    "medium": 22,
+    "low": 3
+   },
+   "high": {
+    "high": 31,
+    "medium": 36,
+    "xhigh": 1,
+    "max": 2
+   },
+   "xhigh": {
+    "high": 4,
+    "max": 7,
+    "xhigh": 1
+   }
+  },
+  "direction_accuracy": 0.6029411764705882,
+  "moves": 0.6617647058823529,
+  "move_precision": 0.5666666666666667,
+  "applied_accuracy": 0.5882352941176471,
+  "applied_within_one": 0.8602941176470589
+ },
+ "latency_ms": {
+  "p50": 2176.864791996195,
+  "p95": 3389.172957991832,
+  "max": 6738.014749993454
+ }
+}

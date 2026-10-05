@@ -1,0 +1,134 @@
+{
+ "name": "zeroshot-qwen3-4b-instruct-2507",
+ "split": "test",
+ "n": 136,
+ "category": {
+  "n": 136,
+  "accuracy": 0.4117647058823529,
+  "within_one": 0.8529411764705882,
+  "macro_f1": 0.3543258711989092,
+  "confusion": {
+   "trivial": {
+    "light": 11,
+    "ordinary": 6,
+    "multi_step": 3,
+    "trivial": 1
+   },
+   "light": {
+    "ordinary": 16,
+    "multi_step": 8,
+    "light": 9
+   },
+   "ordinary": {
+    "ordinary": 24,
+    "multi_step": 13,
+    "light": 5
+   },
+   "multi_step": {
+    "multi_step": 19,
+    "ordinary": 6,
+    "light": 3
+   },
+   "hard": {
+    "multi_step": 9,
+    "hard": 3
+   }
+  },
+  "ece": 0.5234016670900233
+ },
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9338235294117647,
+  "macro_f1": 0.3746586840707813,
+  "confusion": {
+   "low": {
+    "medium": 11,
+    "high": 9,
+    "low": 1
+   },
+   "medium": {
+    "high": 24,
+    "medium": 9
+   },
+   "high": {
+    "high": 62,
+    "medium": 8
+   },
+   "xhigh": {
+    "high": 9,
+    "xhigh": 3
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.23529411764705882,
+  "move_precision": 0.75,
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9338235294117647
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.5661764705882353,
+  "within_one": 0.9779411764705882,
+  "macro_f1": 0.4156708211143695,
+  "confusion": {
+   "low": {
+    "medium": 17,
+    "high": 3,
+    "low": 1
+   },
+   "medium": {
+    "medium": 54,
+    "high": 21
+   },
+   "high": {
+    "high": 19,
+    "medium": 9
+   },
+   "xhigh": {
+    "high": 9,
+    "xhigh": 3
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.4117647058823529,
+  "move_precision": 0.5714285714285714,
+  "applied_accuracy": 0.5661764705882353,
+  "applied_within_one": 0.9779411764705882
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5514705882352942,
+  "within_one": 0.9338235294117647,
+  "macro_f1": 0.3746586840707813,
+  "confusion": {
+   "low": {
+    "medium": 11,
+    "high": 9,
+    "low": 1
+   },
+   "medium": {
+    "high": 24,
+    "medium": 9
+   },
+   "high": {
+    "high": 62,
+    "medium": 8
+   },
+   "xhigh": {
+    "high": 9,
+    "xhigh": 3
+   }
+  },
+  "direction_accuracy": 0.6323529411764706,
+  "moves": 0.23529411764705882,
+  "move_precision": 0.75,
+  "applied_accuracy": 0.5514705882352942,
+  "applied_within_one": 0.9338235294117647
+ },
+ "latency_ms": {
+  "p50": 321.13754100282677,
+  "p95": 847.0115420059301,
+  "max": 1787.2084170012386
+ }
+}

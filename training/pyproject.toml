@@ -1,0 +1,16 @@
+[project]
+name = "auto-effort-training"
+version = "0.1.0"
+description = "Data pipeline, fine-tuning and local server for the auto-effort classifier"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "huggingface_hub>=0.34",
+  "mlx-lm>=0.31",
+  "numpy",
+]
+
+[dependency-groups]
+# Only for the TF-IDF baseline in pipeline/evaluate.py.
+dev = ["scikit-learn"]
+# Only for cloud/import_adapter.py, which merges a cloud-trained LoRA adapter on the CPU.
+merge = ["torch", "peft", "accelerate", "torchvision"]

@@ -1,0 +1,103 @@
+{
+ "name": "baseline-default",
+ "split": "test",
+ "n": 136,
+ "category": {
+  "n": 136,
+  "accuracy": 0.3088235294117647,
+  "within_one": 0.75,
+  "macro_f1": 0.0943820224719101,
+  "confusion": {
+   "trivial": {
+    "ordinary": 21
+   },
+   "light": {
+    "ordinary": 30
+   },
+   "ordinary": {
+    "ordinary": 42
+   },
+   "multi_step": {
+    "ordinary": 30
+   },
+   "hard": {
+    "ordinary": 13
+   }
+  }
+ },
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.5294117647058824,
+  "within_one": 0.8455882352941176,
+  "macro_f1": 0.17307692307692307,
+  "confusion": {
+   "low": {
+    "high": 21
+   },
+   "medium": {
+    "high": 30
+   },
+   "high": {
+    "high": 72
+   },
+   "xhigh": {
+    "high": 13
+   }
+  },
+  "direction_accuracy": 0.5294117647058824,
+  "moves": 0.0,
+  "move_precision": null,
+  "applied_accuracy": 0.5294117647058824,
+  "applied_within_one": 0.8455882352941176
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.5294117647058824,
+  "within_one": 0.9044117647058824,
+  "macro_f1": 0.17307692307692307,
+  "confusion": {
+   "low": {
+    "medium": 21
+   },
+   "medium": {
+    "medium": 72
+   },
+   "high": {
+    "medium": 30
+   },
+   "xhigh": {
+    "medium": 13
+   }
+  },
+  "direction_accuracy": 0.5294117647058824,
+  "moves": 0.0,
+  "move_precision": null,
+  "applied_accuracy": 0.5294117647058824,
+  "applied_within_one": 0.9044117647058824
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.5294117647058824,
+  "within_one": 0.8455882352941176,
+  "macro_f1": 0.17307692307692307,
+  "confusion": {
+   "low": {
+    "high": 21
+   },
+   "medium": {
+    "high": 30
+   },
+   "high": {
+    "high": 72
+   },
+   "xhigh": {
+    "high": 13
+   }
+  },
+  "direction_accuracy": 0.5294117647058824,
+  "moves": 0.0,
+  "move_precision": null,
+  "applied_accuracy": 0.5294117647058824,
+  "applied_within_one": 0.8455882352941176
+ }
+}

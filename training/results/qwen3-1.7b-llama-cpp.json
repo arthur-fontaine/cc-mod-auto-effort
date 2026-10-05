@@ -1,0 +1,143 @@
+{
+ "name": "qwen3-1.7b-llama-cpp",
+ "split": "test",
+ "n": 136,
+ "category": {
+  "n": 136,
+  "accuracy": 0.5661764705882353,
+  "within_one": 0.9338235294117647,
+  "macro_f1": 0.6131714615685147,
+  "confusion": {
+   "trivial": {
+    "trivial": 13,
+    "light": 8
+   },
+   "light": {
+    "ordinary": 9,
+    "light": 18,
+    "trivial": 4,
+    "multi_step": 2
+   },
+   "ordinary": {
+    "light": 13,
+    "ordinary": 22,
+    "multi_step": 6,
+    "trivial": 1
+   },
+   "multi_step": {
+    "ordinary": 7,
+    "light": 4,
+    "multi_step": 14,
+    "trivial": 2,
+    "hard": 1
+   },
+   "hard": {
+    "hard": 10,
+    "multi_step": 2
+   }
+  },
+  "ece": 0.0804141764955769
+ },
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.6544117647058824,
+  "within_one": 0.9779411764705882,
+  "macro_f1": 0.6631320899613583,
+  "confusion": {
+   "low": {
+    "low": 13,
+    "medium": 8
+   },
+   "medium": {
+    "high": 12,
+    "medium": 17,
+    "low": 4
+   },
+   "high": {
+    "medium": 16,
+    "high": 50,
+    "low": 3,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 9,
+    "high": 3
+   }
+  },
+  "direction_accuracy": 0.7426470588235294,
+  "moves": 0.5220588235294118,
+  "move_precision": 0.7183098591549296,
+  "applied_accuracy": 0.6691176470588235,
+  "applied_within_one": 0.9705882352941176
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.7352941176470589,
+  "within_one": 0.9779411764705882,
+  "macro_f1": 0.70967525496511,
+  "confusion": {
+   "low": {
+    "low": 13,
+    "medium": 8
+   },
+   "medium": {
+    "medium": 65,
+    "high": 7,
+    "low": 3
+   },
+   "high": {
+    "medium": 13,
+    "high": 12,
+    "low": 2,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 10,
+    "high": 1,
+    "medium": 1
+   }
+  },
+  "direction_accuracy": 0.75,
+  "moves": 0.3602941176470588,
+  "move_precision": 0.7551020408163265,
+  "applied_accuracy": 0.7205882352941176,
+  "applied_within_one": 0.9558823529411765
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.6544117647058824,
+  "within_one": 0.9779411764705882,
+  "macro_f1": 0.6631320899613583,
+  "confusion": {
+   "low": {
+    "low": 13,
+    "medium": 8
+   },
+   "medium": {
+    "high": 12,
+    "medium": 17,
+    "low": 4
+   },
+   "high": {
+    "medium": 16,
+    "high": 50,
+    "low": 3,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "xhigh": 9,
+    "high": 3
+   }
+  },
+  "direction_accuracy": 0.7426470588235294,
+  "moves": 0.5220588235294118,
+  "move_precision": 0.7183098591549296,
+  "applied_accuracy": 0.6691176470588235,
+  "applied_within_one": 0.9705882352941176
+ },
+ "latency_ms": {
+  "p50": 137.05920899519697,
+  "p95": 391.1890829913318,
+  "max": 793.8074159901589
+ }
+}

@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+# Third-party traces and everything derived from them stay local; the reports are kept.
+data/*
+!data/sources.json
+!data/clean-report.json
+!data/build-report.json
+runs/
+results/*.predictions.jsonl
+logs/
+external/
+cloud/dist/

@@ -1,0 +1,143 @@
+{
+ "name": "qwen3-1.7b-4bit",
+ "split": "test",
+ "n": 136,
+ "category": {
+  "n": 136,
+  "accuracy": 0.5367647058823529,
+  "within_one": 0.9338235294117647,
+  "macro_f1": 0.576317299765895,
+  "confusion": {
+   "trivial": {
+    "trivial": 11,
+    "light": 10
+   },
+   "light": {
+    "ordinary": 9,
+    "light": 17,
+    "trivial": 4,
+    "multi_step": 3
+   },
+   "ordinary": {
+    "light": 13,
+    "ordinary": 21,
+    "multi_step": 7,
+    "trivial": 1
+   },
+   "multi_step": {
+    "ordinary": 7,
+    "light": 1,
+    "multi_step": 15,
+    "trivial": 4,
+    "hard": 1
+   },
+   "hard": {
+    "multi_step": 3,
+    "hard": 9
+   }
+  },
+  "ece": 0.10656771677381849
+ },
+ "level_actual_model": {
+  "n": 136,
+  "accuracy": 0.6544117647058824,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.643624992308972,
+  "confusion": {
+   "low": {
+    "low": 11,
+    "medium": 10
+   },
+   "medium": {
+    "high": 13,
+    "medium": 16,
+    "low": 4
+   },
+   "high": {
+    "medium": 11,
+    "high": 53,
+    "low": 5,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 3,
+    "xhigh": 9
+   }
+  },
+  "direction_accuracy": 0.7573529411764706,
+  "moves": 0.49264705882352944,
+  "move_precision": 0.746268656716418,
+  "applied_accuracy": 0.6691176470588235,
+  "applied_within_one": 0.9558823529411765
+ },
+ "level_as_claude-opus-5-5": {
+  "n": 136,
+  "accuracy": 0.7058823529411765,
+  "within_one": 0.9705882352941176,
+  "macro_f1": 0.6722467576897957,
+  "confusion": {
+   "low": {
+    "medium": 11,
+    "low": 10
+   },
+   "medium": {
+    "medium": 62,
+    "high": 10,
+    "low": 3
+   },
+   "high": {
+    "medium": 9,
+    "high": 15,
+    "low": 3,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 2,
+    "xhigh": 9,
+    "medium": 1
+   }
+  },
+  "direction_accuracy": 0.7279411764705882,
+  "moves": 0.3897058823529412,
+  "move_precision": 0.6981132075471698,
+  "applied_accuracy": 0.6985294117647058,
+  "applied_within_one": 0.9632352941176471
+ },
+ "level_as_claude-sonnet-5-5": {
+  "n": 136,
+  "accuracy": 0.6544117647058824,
+  "within_one": 0.9632352941176471,
+  "macro_f1": 0.643624992308972,
+  "confusion": {
+   "low": {
+    "low": 11,
+    "medium": 10
+   },
+   "medium": {
+    "high": 13,
+    "medium": 16,
+    "low": 4
+   },
+   "high": {
+    "medium": 11,
+    "high": 53,
+    "low": 5,
+    "xhigh": 1
+   },
+   "xhigh": {
+    "high": 3,
+    "xhigh": 9
+   }
+  },
+  "direction_accuracy": 0.7573529411764706,
+  "moves": 0.49264705882352944,
+  "move_precision": 0.746268656716418,
+  "applied_accuracy": 0.6691176470588235,
+  "applied_within_one": 0.9558823529411765
+ },
+ "latency_ms": {
+  "p50": 144.55895900027826,
+  "p95": 405.52300000126706,
+  "max": 824.8886250003125
+ }
+}

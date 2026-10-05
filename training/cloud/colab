@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# The Colab CLI (uv tool install google-colab-cli), asking Google only for Colab access plus
+# the profile and email it identifies you with. Its default scope list adds full Google Cloud
+# and Drive access, and it refreshes the token with that list, which fails once you decline them.
+exec "$HOME/.local/share/uv/tools/google-colab-cli/bin/python" "$(dirname "$0")/colab_shim.py" "$@"

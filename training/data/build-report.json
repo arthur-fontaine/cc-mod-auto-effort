@@ -1,0 +1,115 @@
+{
+ "filtered": {
+  "test_not_pertinent": 7,
+  "test_teacher_disagreement": 51,
+  "dev_not_pertinent": 6,
+  "test_without_both_hindsight_labels": 130,
+  "train_not_pertinent": 34,
+  "train_low_confidence": 3,
+  "train_unlabeled": 1,
+  "train_session_cap": 342,
+  "dev_session_cap": 162,
+  "test_session_cap": 21
+ },
+ "sizes": {
+  "train": 2441,
+  "dev": 160,
+  "test": 136
+ },
+ "sessions": {
+  "train": 367,
+  "dev": 29,
+  "test": 35
+ },
+ "categories": {
+  "train": {
+   "trivial": 468,
+   "light": 719,
+   "ordinary": 718,
+   "multi_step": 456,
+   "hard": 78,
+   "exhaustive": 2
+  },
+  "dev": {
+   "trivial": 30,
+   "light": 54,
+   "ordinary": 47,
+   "multi_step": 19,
+   "hard": 10,
+   "exhaustive": 0
+  },
+  "test": {
+   "trivial": 21,
+   "light": 33,
+   "ordinary": 42,
+   "multi_step": 28,
+   "hard": 12,
+   "exhaustive": 0
+  }
+ },
+ "models": {
+  "train": {
+   "gpt-5.3-codex": 552,
+   "claude-opus-4-6": 509,
+   "claude-fable-5": 312,
+   "claude-opus-4-8": 265,
+   "claude-opus-4-5": 180,
+   "claude-sonnet-4-6": 106,
+   "gpt-5.2-codex": 96,
+   "gpt-5.5": 90,
+   "gpt-5.4": 61,
+   "claude-sonnet-5": 58,
+   "claude-opus-5": 58,
+   "claude-opus-4-7": 46,
+   "gpt-4.1": 28,
+   "claude-haiku-4-5": 15,
+   "glm-5.2": 13,
+   "mini-fable-5": 10,
+   "qwen-fable5": 8,
+   "claude-sonnet-4": 7,
+   "gemini-3-pro-preview": 5,
+   "gemini-3.1-pro-preview": 3,
+   "copilot": 3,
+   "kimi-k2.6": 3,
+   "gpt-5.6-sol": 2,
+   "claude-opus-5-5": 2,
+   "composer 2.5 fast": 1,
+   "glm-5.2-nvfp4": 1,
+   "grok-4.5": 1,
+   "grok-4.7-build": 1,
+   "qwopus3.6-27b-coder-8bit.mlx": 1,
+   "gemma-4-26b-a4b-it": 1,
+   "claude-fable-5-1": 1,
+   "claude-opus-4-0": 1,
+   "gemini-3.5-flash": 1
+  },
+  "dev": {
+   "gpt-5.3-codex": 45,
+   "claude-opus-4-6": 41,
+   "claude-fable-5": 29,
+   "gpt-5.4": 12,
+   "claude-sonnet-4-6": 12,
+   "claude-opus-4-7": 12,
+   "claude-opus-4-8": 3,
+   "gpt-5.5": 2,
+   "claude-opus-5": 2,
+   "mini-fable-5": 1,
+   "gpt-4.1": 1
+  },
+  "test": {
+   "claude-opus-4-6": 33,
+   "claude-opus-4-5": 33,
+   "claude-opus-4-8": 27,
+   "claude-sonnet-4-6": 16,
+   "claude-sonnet-5": 14,
+   "claude-fable-5": 8,
+   "claude-opus-5": 4,
+   "claude-fable-5-1": 1
+  }
+ },
+ "teacher_agreement": {
+  "category": 0.755,
+  "level": 0.812,
+  "n": 208
+ }
+}

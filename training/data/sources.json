@@ -1,0 +1,1290 @@
+[
+ {
+  "repo": "thomasmustier/pi-for-excel-sessions",
+  "files": 173,
+  "bytes": 299851589,
+  "models": {
+   "gpt-5.2-codex": 58,
+   "claude-opus-4-5": 1
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "DedeProGames/claude-code-traces-pt-br",
+  "files": 20,
+  "bytes": 184991523,
+  "models": {
+   "claude-opus-4-8": 102
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Infatoshi/kernelbench-mega-traces",
+  "files": 132,
+  "bytes": 145807722,
+  "models": {
+   "gpt-5.5": 132,
+   "claude-opus-4-8": 56
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "shijunhao/Fable-5-traces",
+  "files": 950,
+  "bytes": 142071168,
+  "models": {
+   "claude-opus-4-8": 7,
+   "claude-fable-5": 6
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "PRATHAM4567/Fable-5-traces",
+  "files": 950,
+  "bytes": 142071168,
+  "models": {
+   "claude-opus-4-8": 7,
+   "claude-fable-5": 6
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "owenqwenllmwine/fable-5-pi",
+  "files": 55,
+  "bytes": 112698245,
+  "models": {
+   "claude-fable-5": 55
+  },
+  "formats": [
+   "claude-code",
+   "pi"
+  ]
+ },
+ {
+  "repo": "TerraBytes/claude-fable-5-claude-code-traces",
+  "files": 63,
+  "bytes": 75104357,
+  "models": {
+   "claude-fable-5": 57
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "armand0e/claude-fable-5-claude-code",
+  "files": 63,
+  "bytes": 75104357,
+  "models": {
+   "claude-fable-5": 57
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "AyoubChLin/claude-fable-5-claude-code",
+  "files": 63,
+  "bytes": 75104357,
+  "models": {
+   "claude-fable-5": 57
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "ShaunGves/claude-fable-5-claude-code",
+  "files": 63,
+  "bytes": 75104357,
+  "models": {
+   "claude-fable-5": 57
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "cfahlgren1/Fable-5-traces",
+  "files": 115,
+  "bytes": 62071158,
+  "models": {
+   "claude-opus-4-8": 24,
+   "claude-fable-5": 4,
+   "mini-fable-5": 2
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Samarth0710/traceweave",
+  "files": 993,
+  "bytes": 61558154,
+  "models": {
+   "claude-opus-4-6": 29,
+   "claude-sonnet-4-5-20250929": 1,
+   "claude-opus-4-5-20251101": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Auenchanters/repro-conservation-laws-for-modern-neural-architectures-traces",
+  "files": 1,
+  "bytes": 50072589,
+  "models": {
+   "claude-fable-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "AlinCiocan/fable-5-claude-code-traces",
+  "files": 18,
+  "bytes": 49878284,
+  "models": {
+   "claude-fable-5": 120,
+   "<synthetic>": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "JG1310/repro-on-the-theory-of-continual-learning-with-gradient-descent-for-neural-networks-traces",
+  "files": 1,
+  "bytes": 48615832,
+  "models": {
+   "claude-fable-5": 29
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "davidkling/hf-coding-tools-traces-all",
+  "files": 31,
+  "bytes": 47330212,
+  "models": {
+   "claude-opus-4-6": 125
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/clem_mentionsanalysis_whatsbest_april26",
+  "files": 31,
+  "bytes": 44715388,
+  "models": {
+   "claude-opus-4-6": 125
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/hf-coding-tools-traces",
+  "files": 34,
+  "bytes": 43613230,
+  "models": {
+   "claude-opus-4-6": 129
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "davidkling/hf-coding-tools-traces-run-april12",
+  "files": 31,
+  "bytes": 42397766,
+  "models": {
+   "claude-opus-4-6": 130
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "cfahlgren1/hf-coding-tools-traces",
+  "files": 32,
+  "bytes": 42129083,
+  "models": {
+   "claude-opus-4-6": 130
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/hf-coding-tools-traces_april26",
+  "files": 32,
+  "bytes": 42120347,
+  "models": {
+   "claude-opus-4-6": 130
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Auenchanters/repro-towards-optimal-robustness-in-learning-augmented-paging-traces",
+  "files": 1,
+  "bytes": 39990215,
+  "models": {
+   "claude-fable-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Eishaan/repro-fixed-budget-no-harder-than-fixed-confidence-bai-traces",
+  "files": 1,
+  "bytes": 33554774,
+  "models": {
+   "claude-opus-5": 20
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "victor/fable-5-boeing-747-trace",
+  "files": 1,
+  "bytes": 31572932,
+  "models": {
+   "claude-fable-5": 26
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/pine-of-glass-sessions",
+  "files": 20,
+  "bytes": 24434309,
+  "models": {
+   "claude-opus-4-8": 13,
+   "gpt-5.5": 6
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "Auenchanters/repro-score-a-unified-framework-for-overshoot-refund-in-online-fdr-control-traces",
+  "files": 1,
+  "bytes": 22053738,
+  "models": {
+   "claude-fable-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "nstp/repro-the-implicit-bias-of-adam-and-muon-on-smooth-homogeneous-neural-networks-traces",
+  "files": 2,
+  "bytes": 21394274,
+  "models": {
+   "claude-opus-4-8": 27
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "build-small-hackathon/job-search-assistant-agent-trace",
+  "files": 1,
+  "bytes": 20423484,
+  "models": {
+   "claude-opus-4-7": 28,
+   "<synthetic>": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "dacorvo/funes-handoff-recall-benchmark",
+  "files": 60,
+  "bytes": 19650384,
+  "models": {
+   "claude-opus-4-8": 27,
+   "claude-fable-5-1": 6
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/ml-intern-sessions",
+  "files": 92,
+  "bytes": 19483589,
+  "models": {
+   "bedrock/us.anthropic.claude-opus-4-6-v1": 48,
+   "openai/gpt-5.5": 15
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Auenchanters/repro-improved-distribution-estimation-in-ell-infty-traces",
+  "files": 1,
+  "bytes": 18230468,
+  "models": {
+   "claude-fable-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "kaofelix/video-scissors-sessions",
+  "files": 15,
+  "bytes": 14306729,
+  "models": {
+   "claude-opus-4-5": 51,
+   "gpt-5.4": 15
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "Eishaan/repro-revisiting-zeroth-order-hessian-approximation-traces",
+  "files": 2,
+  "bytes": 13665224,
+  "models": {
+   "claude-opus-4-8": 44,
+   "claude-opus-5": 20
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Eishaan/repro-revisiting-zeroth-order-hessian-approximation-policy-lens-traces",
+  "files": 2,
+  "bytes": 13624528,
+  "models": {
+   "claude-opus-4-8": 44,
+   "claude-opus-5": 20
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/clean-slides-sessions",
+  "files": 12,
+  "bytes": 13054217,
+  "models": {
+   "claude-opus-4-5": 74,
+   "claude-opus-4-6": 32
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "mackenzietechdocs/repro-beyond-text-to-sql-can-llms-really-debug-enterprise-etl-sql-traces",
+  "files": 1,
+  "bytes": 11333959,
+  "models": {
+   "claude-sonnet-5": 25
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "aaaaliou/pi-playdate",
+  "files": 2,
+  "bytes": 11300110,
+  "models": {
+   "claude-opus-4-6": 40
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "nmaher/repro-on-the-theory-of-continual-learning-with-gradient-descent-for-neural-networks-traces",
+  "files": 1,
+  "bytes": 11191041,
+  "models": {
+   "claude-opus-5": 26
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "riteshhf/repro-from-prior-to-pro-efficient-skill-mastery-via-distribution-contractive-rl-traces",
+  "files": 1,
+  "bytes": 9949166,
+  "models": {
+   "claude-opus-5": 24
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "INONONO/tarkov-customs-trajectory",
+  "files": 1,
+  "bytes": 9459593,
+  "models": {
+   "claude-fable-5-1": 7
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "build-small-hackathon/kirana-detective-build-traces",
+  "files": 11,
+  "bytes": 9358415,
+  "models": {
+   "claude-sonnet-4-6": 33
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/claude-cowork-traces",
+  "files": 1,
+  "bytes": 8225954,
+  "models": {
+   "claude-fable-5": 16
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "notitlenikno504/Hood-Ninja",
+  "files": 1,
+  "bytes": 8050771,
+  "models": {
+   "claude-opus-4-8": 37
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "riteshhf/repro-learning-fingerprints-for-medical-time-series-with-redundancy-constrained-info-traces",
+  "files": 1,
+  "bytes": 6800488,
+  "models": {
+   "claude-opus-5": 16
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "lvwerra/carbon-agent-traces",
+  "files": 1,
+  "bytes": 6258596,
+  "models": {
+   "claude-opus-4-7": 35
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "reinaldog/repro-understanding-sam-through-minimax-perspective-traces",
+  "files": 1,
+  "bytes": 6206729,
+  "models": {
+   "claude-opus-5": 35
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-stochastic-linear-bandits-with-parameter-noise-traces",
+  "files": 1,
+  "bytes": 5916100,
+  "models": {
+   "claude-sonnet-5": 16
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "naazimsnh02/tutordesk-agent-traces",
+  "files": 7,
+  "bytes": 5686154,
+  "models": {
+   "claude-sonnet-4-6": 63
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "skapoor18ancde/repro-fuse-full-spectrum-unlearnable-examples-via-spectral-equalization-traces",
+  "files": 1,
+  "bytes": 5163935,
+  "models": {
+   "claude-sonnet-5": 32
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "wakeupmh/repro-when-to-trust-the-cheap-check-traces",
+  "files": 1,
+  "bytes": 5090243,
+  "models": {
+   "claude-opus-4-8": 11
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "riteshhf/repro-siamesenorm-breaking-the-barrier-to-reconciling-pre-post-norm-traces",
+  "files": 1,
+  "bytes": 4927905,
+  "models": {
+   "claude-opus-5": 23,
+   "<synthetic>": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "stresearch-dev/63430-traces",
+  "files": 1,
+  "bytes": 4622621,
+  "models": {
+   "claude-sonnet-5": 43
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "yellowbeeblackbee/claude-traces",
+  "files": 4,
+  "bytes": 4112115,
+  "models": {
+   "claude-fable-5": 56
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "ultralazr/claude-code-traces",
+  "files": 2,
+  "bytes": 4064978,
+  "models": {
+   "claude-opus-4-6": 27,
+   "claude-sonnet-4-6": 5
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "cfahlgren1/agent-sessions-list",
+  "files": 10,
+  "bytes": 4010638,
+  "models": {
+   "claude-opus-4-6": 18,
+   "moonshotai/Kimi-K2.6": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "DreamyDetective/trace-demo",
+  "files": 3,
+  "bytes": 3996952,
+  "models": {
+   "coder-model": 48,
+   "claude-sonnet-4-6": 25
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/economist-tui-sessions",
+  "files": 11,
+  "bytes": 3986195,
+  "models": {
+   "gemini-3-pro-preview": 41,
+   "claude-opus-4-5": 20,
+   "gpt-5.2-codex": 1
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "davidkling/hf-coding-tools-traces-run-april22-v2",
+  "files": 7,
+  "bytes": 3839706,
+  "models": {
+   "gpt-4.1-mini": 81,
+   "claude-opus-4-6": 39,
+   "claude-sonnet-4-6": 35
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-finite-and-corruption-robust-regret-bounds-in-online-inverse-linear-optimization-traces",
+  "files": 1,
+  "bytes": 3567510,
+  "models": {
+   "claude-sonnet-5": 17
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-minimum-distance-summaries-lq8f-traces",
+  "files": 1,
+  "bytes": 3455199,
+  "models": {
+   "claude-opus-5": 2,
+   "claude-fable-5": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "rakshi-the-neural-nexus/repro-stage-bo-adaptive-epsilon-constraint-decomposition-traces",
+  "files": 1,
+  "bytes": 3337664,
+  "models": {
+   "claude-opus-5": 38
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-learning-to-bet-horizon-aware-traces",
+  "files": 1,
+  "bytes": 3254889,
+  "models": {
+   "claude-opus-4-8": 10
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "jrubiosainz/capbencher-2505-18102-traces",
+  "files": 4,
+  "bytes": 3169344,
+  "models": {
+   "claude-opus-5": 43,
+   "gpt-5.6-sol": 34
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "merve/ml-intern-sessions",
+  "files": 8,
+  "bytes": 3106724,
+  "models": {
+   "bedrock/us.anthropic.claude-opus-4-6-v1": 71,
+   "openai/gpt-5.5": 36
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/pi-computer-use-sessions",
+  "files": 7,
+  "bytes": 2974694,
+  "models": {
+   "gpt-5.5": 2,
+   "claude-sonnet-4-6": 1
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-latent-collaboration-in-multi-agent-systems-traces",
+  "files": 1,
+  "bytes": 2665139,
+  "models": {
+   "claude-opus-4-8": 3
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/mentionsanalysis_builders_april26",
+  "files": 5,
+  "bytes": 2614243,
+  "models": {
+   "gpt-4.1-mini": 75,
+   "claude-opus-4-6": 40,
+   "claude-sonnet-4-6": 36
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "JohnBeanerson/strudel-coder",
+  "files": 6,
+  "bytes": 2531362,
+  "models": {
+   "claude-sonnet-4-6": 49
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-skill-neologisms-traces",
+  "files": 1,
+  "bytes": 2350820,
+  "models": {
+   "claude-opus-4-8": 7
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "LarsEckart/approvaltests-java-sessions",
+  "files": 15,
+  "bytes": 2336062,
+  "models": {
+   "claude-opus-4-5": 46
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-fourier-learning-dynamics-traces",
+  "files": 1,
+  "bytes": 2146006,
+  "models": {
+   "claude-opus-4-8": 3
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "prarabdhmisra/71132-traces",
+  "files": 2,
+  "bytes": 2128792,
+  "models": {
+   "claude-opus-5": 54
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Pabloler21/repro-a-tight-theory-of-error-feedback-algorithms-in-distributed-optimization-traces",
+  "files": 1,
+  "bytes": 2080611,
+  "models": {
+   "claude-opus-4-8": 30
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-fast-and-scalable-analytical-diffusion-traces",
+  "files": 1,
+  "bytes": 1974352,
+  "models": {
+   "claude-opus-4-8": 11,
+   "claude-fable-5": 6
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomwolf/am-session-sharing-design",
+  "files": 1,
+  "bytes": 1864041,
+  "models": {
+   "claude-opus-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "abidlabs/repro-how-much-can-language-models-memorize-traces",
+  "files": 1,
+  "bytes": 1718909,
+  "models": {
+   "claude-opus-4-8": 32
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-on-structured-state-space-duality-traces",
+  "files": 1,
+  "bytes": 1524894,
+  "models": {
+   "claude-sonnet-5": 25
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "gabegoodhart/traces.claude-code.mlx-lm-granitemoehybrid",
+  "files": 1,
+  "bytes": 1478346,
+  "models": {
+   "claude-sonnet-4-20250514": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "prarabdhmisra/Vv4XRZDMM0-traces",
+  "files": 1,
+  "bytes": 1433998,
+  "models": {
+   "claude-opus-5": 12
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "RyeCatcher/repro-consistent-adversarial-attacks-traces",
+  "files": 1,
+  "bytes": 1307902,
+  "models": {
+   "claude-sonnet-5": 14
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "MarxistLeninist/repro-ambient-dataloops-traces",
+  "files": 1,
+  "bytes": 1278273,
+  "models": {
+   "claude-opus-4-8": 4
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-dimension-independent-convergence-of-underdamped-langevin-monte-carlo-in-kl-dive-traces",
+  "files": 1,
+  "bytes": 1254912,
+  "models": {
+   "claude-sonnet-5": 33
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomwolf/am-session-sharing-design-noimg",
+  "files": 1,
+  "bytes": 1234586,
+  "models": {
+   "claude-opus-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "INONONO/fable-5.1-mario-trajectory",
+  "files": 1,
+  "bytes": 1170579,
+  "models": {
+   "claude-fable-5-1": 5
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-dynamic-regret-via-discounted-to-dynamic-reduction-with-applications-to-curved-l-traces",
+  "files": 1,
+  "bytes": 1117311,
+  "models": {
+   "claude-sonnet-5": 28
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/heypocket-reader-sessions",
+  "files": 9,
+  "bytes": 1107301,
+  "models": {
+   "gpt-5.4": 10,
+   "claude-opus-4-6": 7
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-softmax-as-linear-attention-in-the-large-prompt-regime-a-measure-based-perspecti-traces",
+  "files": 1,
+  "bytes": 1044693,
+  "models": {
+   "claude-sonnet-5": 19
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-why-agentic-theorem-prover-works-a-statistical-provability-theory-of-mathematica-traces",
+  "files": 1,
+  "bytes": 957913,
+  "models": {
+   "claude-sonnet-5": 28
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-sharp-inequalities-between-total-variation-and-hellinger-distances-for-gaussian-traces",
+  "files": 1,
+  "bytes": 927071,
+  "models": {
+   "claude-sonnet-5": 33
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-high-probability-convergence-guarantees-of-decentralized-sgd-traces",
+  "files": 1,
+  "bytes": 920046,
+  "models": {
+   "claude-sonnet-5": 41
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "multimodalart/agent-spaces-traces",
+  "files": 6,
+  "bytes": 845302,
+  "models": {
+   "claude-opus-4-6": 116
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-learning-in-structured-stackelberg-games-traces",
+  "files": 1,
+  "bytes": 830626,
+  "models": {
+   "claude-sonnet-5": 20
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-sample-complexity-bounds-for-robust-mean-estimation-with-mean-shift-contaminatio-traces",
+  "files": 1,
+  "bytes": 808555,
+  "models": {
+   "claude-sonnet-5": 42
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "davanstrien/agent-race-traces",
+  "files": 4,
+  "bytes": 793807,
+  "models": {
+   "moonshotai/Kimi-K2.6": 56,
+   "claude-opus-4-7": 45,
+   "bedrock/us.anthropic.claude-opus-4-6-v1": 26
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "RyeCatcher/repro-balancing-learning-rates-traces",
+  "files": 1,
+  "bytes": 793744,
+  "models": {
+   "claude-sonnet-5": 19
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-optimal-regret-for-policy-optimization-in-contextual-bandits-traces",
+  "files": 1,
+  "bytes": 754792,
+  "models": {
+   "claude-sonnet-5": 31
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-ski-rental-with-distributional-predictions-of-unknown-quality-traces",
+  "files": 1,
+  "bytes": 735586,
+  "models": {
+   "claude-sonnet-5": 21
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "ParetoOptimal/repro-hocdjaeaim-traces",
+  "files": 1,
+  "bytes": 714548,
+  "models": {
+   "claude-opus-4-8": 66
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-tighter-regret-lower-bound-for-gaussian-process-bandits-with-squared-exponential-traces",
+  "files": 1,
+  "bytes": 688707,
+  "models": {
+   "claude-sonnet-5": 44
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Quaxicron/claude-opus-4.8-pi-traces",
+  "files": 4,
+  "bytes": 677172,
+  "models": {
+   "anthropic/claude-opus-4.8": 96
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "tomyimkc/repro-on-regret-bounds-of-thompson-sampling-for-bayesian-optimization-traces",
+  "files": 1,
+  "bytes": 648820,
+  "models": {
+   "claude-sonnet-5": 30
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "RyeCatcher/repro-convergence-rate-of-the-last-iterate-of-stochastic-proximal-algorithms-traces",
+  "files": 1,
+  "bytes": 630239,
+  "models": {
+   "claude-sonnet-5": 14
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomasmustier/pi-symphony-sessions",
+  "files": 8,
+  "bytes": 567475,
+  "models": {
+   "gpt-5.3-codex": 1,
+   "gpt-5.4": 1,
+   "claude-opus-4-0-20250514": 1
+  },
+  "formats": [
+   "pi"
+  ]
+ },
+ {
+  "repo": "lhoestq/agent-traces-example",
+  "files": 4,
+  "bytes": 470087,
+  "models": {
+   "claude-opus-4-6": 45,
+   "gpt-5.4": 2
+  },
+  "formats": [
+   "claude-code",
+   "codex"
+  ]
+ },
+ {
+  "repo": "jedisct1/starfall-quest-qwopus-coder-trace",
+  "files": 1,
+  "bytes": 190640,
+  "models": {
+   "Qwopus3.6-27B-Coder-8bit.mlx": 49
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "victor/claude-fable-worldcup-2026-session",
+  "files": 1,
+  "bytes": 100809,
+  "models": {
+   "claude-fable-5": 19
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "huggingface/forensic-refusal",
+  "files": 2,
+  "bytes": 84545,
+  "models": {
+   "claude-opus-4-8": 21,
+   "nvidia/GLM-5.2-NVFP4": 13,
+   "claude-fable-5": 5,
+   "<synthetic>": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "clem/nanoclaw-traces",
+  "files": 1,
+  "bytes": 68351,
+  "models": {
+   "claude-sonnet-4-6": 17
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "Samarth0710/traceweave-viewer-test",
+  "files": 6,
+  "bytes": 64262,
+  "models": {
+   "gpt-5.5": 2,
+   "claude-opus-4-6": 1,
+   "gpt-5.4": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomwolf/am-session-claude-code-1-c3cc0a",
+  "files": 1,
+  "bytes": 19402,
+  "models": {
+   "claude-opus-5": 2
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "thomwolf/am-session-claude-code-1-a66490",
+  "files": 1,
+  "bytes": 17175,
+  "models": {
+   "claude-opus-5": 1
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "JohnBeanerson/claude-code-sessions-test",
+  "files": 1,
+  "bytes": 3314,
+  "models": {
+   "claude-opus-4-6": 2
+  },
+  "formats": [
+   "claude-code"
+  ]
+ },
+ {
+  "repo": "cfahlgren1/openclaw-test",
+  "files": 1,
+  "bytes": 2408,
+  "models": {
+   "claude-opus-4-6": 1
+  },
+  "formats": [
+   "pi"
+  ]
+ }
+]

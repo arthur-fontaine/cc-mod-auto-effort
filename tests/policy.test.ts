@@ -98,10 +98,18 @@ test('a saved cloud setup never leaks into Nisev', () => {
 
 test('Nisev needs a local endpoint, whose port it serves on', () => {
   expect(resolveConfig({ provider: 'nisev', endpoint: 'http://127.0.0.1:9000/v1/systemone' }).port).toBe(9000)
-  expect(resolveConfig({ provider: 'nisev', endpoint: 'https://example.com/v1/systemone' }).missing.length).toBe(1)
+  expect(resolveConfig({ provider: 'nisev', endpoint: 'https://example.com/v1/systemone' }).problems.length).toBe(1)
 })
 
 test('Nisev is asked under its alias, whatever file llama.cpp serves', () => {
   const config = resolveConfig({ provider: 'nisev', model: '/models/nisev.gguf' })
   expect(buildRequest({ prompt: 'hi' }, config).model).toBe('nisev')
+})
+
+test("a cloud endpoint's settings left in the environment are reported for Nisev, not served", () => {
+  const env = { provider: 'nisev', endpoint: 'https://opencode.ai/zen/v1/systemone', model: 'jev-1.13' }
+  const { problems } = resolveConfig(env)
+  expect(problems.length).toBe(2)
+  expect(problems[0]).toMatch(/AUTO_EFFORT_ENDPOINT is https:\/\/opencode\.ai/)
+  expect(problems[1]).toMatch(/AUTO_EFFORT_MODEL is jev-1\.13/)
 })

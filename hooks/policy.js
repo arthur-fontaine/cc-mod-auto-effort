@@ -184,6 +184,11 @@ export function localPort(endpoint) {
   return match ? Number(match[1]) : null
 }
 
+// What llama.cpp can serve: a .gguf path, or a Hugging Face repo with an optional :quant.
+export function isGgufSource(model) {
+  return /\.gguf$/i.test(model ?? '') || /^[\w.-]+\/[\w.-]+(:[\w.-]+)?$/.test(model ?? '')
+}
+
 export function resolveConfig(env = {}, stored = {}) {
   // The environment wins: an endpoint there means a cloud endpoint unless AUTO_EFFORT_PROVIDER says otherwise.
   const provider = [env.provider, env.endpoint && 'jev', stored.provider].find((p) => ['jev', 'nisev'].includes(p))
@@ -205,8 +210,14 @@ export function resolveConfig(env = {}, stored = {}) {
   }
   if (nisev) {
     config.port = localPort(config.endpoint)
-    config.missing = config.port ? [] : ['AUTO_EFFORT_ENDPOINT (for Nisev, a local URL such as ' + NISEV.endpoint + ')']
+    // Usually a cloud endpoint's settings left in the environment, so say what they are.
+    config.problems = [
+      ...(config.port ? [] : ['AUTO_EFFORT_ENDPOINT is ' + config.endpoint + ', not a local URL such as ' + NISEV.endpoint]),
+      ...(isGgufSource(config.model) ? [] : ['AUTO_EFFORT_MODEL is ' + config.model + ', not a Hugging Face repo:quant or a .gguf path']),
+    ]
+    config.missing = []
   } else {
+    config.problems = []
     config.missing = Object.keys(REQUIRED).filter((key) => !config[key]).map((key) => REQUIRED[key])
   }
   return config

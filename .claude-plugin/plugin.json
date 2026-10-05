@@ -2,7 +2,7 @@
   "name": "auto-effort",
   "displayName": "Auto Effort",
   "version": "0.1.0",
-  "description": "Lets Jev, a System One model, pick Claude's effort level for each prompt",
+  "description": "Picks Claude's effort level for each prompt with a System One decision model",
   "author": {
     "name": "Arthur Fontaine"
   },
@@ -13,5 +13,6 @@
     "jev",
     "opencode",
     "mod"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

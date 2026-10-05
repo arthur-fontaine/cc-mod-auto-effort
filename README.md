@@ -82,7 +82,7 @@ cloud models it depends on the provider. Details in the [benchmark](#benchmark).
   manager.
 - **First start**: setup asks before downloading. llama.cpp then fetches the model and
   caches it, which takes about 3 minutes on a fast connection. Prompts keep the session's
-  effort until the status line says Nisev is ready.
+  effort until the prompt footer says Nisev is ready.
 - **While it runs**: the mod serves it on `127.0.0.1:8765` for the session, using about
   2 GB of memory, and stops it with the session.
 - **Privacy**: nothing leaves your machine, apart from that one-time download.
@@ -179,9 +179,13 @@ run `/reload-plugins`.
 | `AUTO_EFFORT_API_KEY` | The endpoint's key. Only ever read from the environment. | Not used. |
 | `AUTO_EFFORT_LLAMA_SERVER` | Not used. | The llama.cpp binary, `llama-server` or `llama`. Defaults to the first on your `PATH`. |
 
-What setup saved applies only to the provider it was saved for. While a cloud endpoint
-lacks its endpoint, key or model, the mod changes nothing, and the status line and
-`/auto-effort` say what's missing.
+What setup saved applies only to the provider it was saved for. The mod changes nothing,
+and the status line and `/auto-effort` say why, while:
+
+- a cloud endpoint lacks its endpoint, key or model;
+- Nisev is selected but `AUTO_EFFORT_ENDPOINT` or `AUTO_EFFORT_MODEL` holds a cloud
+  endpoint's value, such as one left in a repository's settings. Unset them to use Nisev's
+  defaults.
 
 **Behavior**
 
@@ -227,9 +231,10 @@ set with `/effort`, when:
 - no provider is set up, the Claude model takes no effort, or the request comes from a
   subagent.
 
-The status line shows each decision, with the decision model's confidence:
+The prompt footer shows each decision, beside Claude Code's own mode labels, with the
+decision model's confidence (in the terminal and the desktop app):
 
-| Status line | Meaning |
+| Footer | Meaning |
 | :- | :- |
 | `effort high · 82%` | It picked `high`, 82% sure, so this turn runs at `high`. |
 | `effort default · 70%` | It picked the Claude model's default, so your session's effort stands. |

@@ -1,3 +1,5 @@
+import { atom, read, update } from 'claude-code'
+
 import { buildRequest, decide, describe, JEV_PRESETS, LEVELS, NISEV, resolveConfig } from './policy.js'
 import { parseBuild, parseServerOutput, serverArgs, serverCommand, servesOurModel } from './nisev.js'
 
@@ -10,6 +12,15 @@ const decisions = new Map()
 let enabled = true
 let lastDecision = null
 let warnedMissing = false
+
+// What the mod reports without asking anything of you (the last decision, Nisev starting) goes
+// to the footer's mode labels; the status line, which the engine draws as a notice, is kept for
+// what needs action.
+const label = atom({ plugin: 'auto-effort', key: 'label' }, null)
+
+function show($, text) {
+  return update($, label, () => text).catch(() => {})
+}
 // The llama-server this module started, if any: { state: starting | downloading | ready | stopped }.
 let server = null
 // Set once a request reached Nisev, so a prompt doesn't probe the port every time.
@@ -58,7 +69,7 @@ async function startNisev($, config) {
   server = current
   const { binary } = await findServer($, config)
   // llama.cpp may print nothing while it downloads, so say up front that the first start can take minutes.
-  $.ui.status('auto-effort: starting Nisev (the first start downloads ' + NISEV.sizeLabel + ')')
+  void show($, 'Nisev starting · the first start downloads ' + NISEV.sizeLabel)
   void (async () => {
     try {
       // The loop is the child's life: it ends with the child or with this module.
@@ -67,15 +78,16 @@ async function startNisev($, config) {
         if (seen.ready && current.state !== 'ready') {
           current.state = 'ready'
           nisevConfirmed = true
-          $.ui.status('auto-effort: Nisev ready')
+          void show($, 'Nisev ready')
         } else if (seen.percent !== undefined && current.state !== 'ready') {
           current.state = 'downloading'
-          $.ui.status('auto-effort: downloading the model · ' + seen.percent + '%')
+          void show($, 'Nisev downloading · ' + seen.percent + '%')
         }
         $.ui.log(text.trimEnd(), { to: 'debug' })
       }
     } catch (error) {
       $.ui.log('llama-server failed to start: ' + error.message, { to: 'debug' })
+      void show($, null)
       $.ui.status('auto-effort: llama-server failed to start, see the debug log')
     }
     current.state = 'stopped'
@@ -156,10 +168,12 @@ async function classify($, prompt) {
     }
     return null
   }
-  if (config.missing.length) {
+  if (config.missing.length || config.problems.length) {
     if (!warnedMissing) {
       warnedMissing = true
-      $.ui.status('auto-effort: set ' + config.missing.join(', '))
+      $.ui.status(config.problems.length
+        ? 'auto-effort: Nisev is selected, but ' + config.problems.join('; ') + '. Unset them to use its defaults.'
+        : 'auto-effort: set ' + config.missing.join(', '))
     }
     return null
   }
@@ -278,7 +292,7 @@ async function status($) {
   const lines = ['Effort picker: ' + (enabled ? 'on' : 'off')]
   if (config.provider === 'nisev') {
     lines.push('Provider: Nisev ' + config.model + ' · llama.cpp at ' + config.endpoint + ' (' + nisevState() + ')')
-    if (config.missing.length) lines.push('Missing: ' + config.missing.join(', '))
+    for (const problem of config.problems) lines.push('Problem: ' + problem)
   } else {
     lines.push('Provider: ' + (config.provider ? 'System One endpoint' : 'not set, run /auto-effort setup'))
     lines.push('Endpoint: ' + (config.endpoint ?? 'unset') + ' · model ' + (config.model ?? 'unset'))
@@ -314,7 +328,7 @@ export function register(on) {
     const result = await next(e)
     // Warm Nisev up before the first prompt needs it.
     const config = await loadConfig($)
-    if (enabled && config.provider === 'nisev') await startNisev($, config)
+    if (enabled && config.provider === 'nisev' && !config.problems.length) await startNisev($, config)
     return result
   })
 
@@ -327,7 +341,8 @@ export function register(on) {
     const decision = await classify($, e.text)
     if (decision) {
       lastDecision = decision
-      $.ui.status(describe(decision))
+      await show($, describe(decision))
+      $.ui.status(undefined)
       pending = decision
     }
     const result = await next(e)
@@ -342,6 +357,11 @@ export function register(on) {
       pending = null
     }
     return next(e)
+  })
+
+  on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
+    const text = await read($, label)
+    return text ? next({ ...e, props: { ...e.props, modes: [...e.props.modes, text] } }) : next(e)
   })
 
   on('turn.step', async function* ($, e, next) {
@@ -370,7 +390,8 @@ export function register(on) {
       } catch {
         // Applies to this session only.
       }
-      $.ui.status(enabled ? 'auto-effort on' : undefined)
+      $.ui.status(undefined)
+      await show($, enabled ? null : 'effort picker off')
       return { text: 'Effort picker turned ' + arg + '.' }
     }
     if (arg && arg !== 'status') return { text: 'Usage: /auto-effort [setup|on|off|status]' }

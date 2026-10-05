@@ -30,7 +30,7 @@ const ENV = {
 
 // Stubs everything the mod reaches, and records what the model request carried.
 function stub(on: any, { env = ENV, fetch, submit, model = 'claude-opus-5-5', saved, clock = true }: Setup & { clock?: boolean }) {
-  const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[] }
+  const seen = { requests: [] as any[], efforts: [] as unknown[], statuses: [] as unknown[], labels: [] as unknown[] }
   if (clock) mock.clock(on)
   mock.env(on, env)
   if (saved) {
@@ -49,6 +49,15 @@ function stub(on: any, { env = ENV, fetch, submit, model = 'claude-opus-5-5', sa
     return { value: undefined }
   })
   on('ui.log', () => ({ value: undefined }))
+  // The footer label lives in $.state, which the test engine leaves to the plugin's tests.
+  const state = new Map<string, { value: unknown; version: number }>()
+  on('state.get', ($: any, e: any) => ({ value: state.get(e.plugin + '.' + e.key) ?? { value: undefined, version: 0 } }))
+  on('state.set', ($: any, e: any) => {
+    const version = (state.get(e.plugin + '.' + e.key)?.version ?? 0) + 1
+    state.set(e.plugin + '.' + e.key, { value: e.value, version })
+    if (e.key === 'label') seen.labels.push(e.value)
+    return { value: { isSet: true, version } }
+  })
   on('http.fetch', ($: any, e: any) => {
     seen.requests.push({ url: e.url, headers: e.init?.headers, body: JSON.parse(e.init?.body ?? '{}') })
     return fetch ? fetch(e) : { value: jevReply({ choice: 'high', confidence: 0.9 }) }
@@ -80,7 +89,7 @@ test('a confident Jev answer sets the effort of the turn', async ($, on) => {
   const seen = stub(on, {})
   await runTurn($, 'Migrate every module from callbacks to async/await and make the tests pass')
   expect(seen.efforts).toEqual(['high'])
-  expect(seen.statuses).toContain('effort high · 90%')
+  expect(seen.labels).toContain('effort high · 90%')
 })
 
 test('the request goes to the configured endpoint with the key and model', async ($, on) => {
@@ -267,7 +276,7 @@ test('Nisev is asked the category question, and its answer is mapped for the mod
   expect(Object.keys(req.body.questions.effort.criteria)).toEqual(['trivial', 'light', 'ordinary', 'multi_step', 'hard', 'exhaustive'])
   // Opus 5.5 defaults to medium: verified multi-step work is raised to high.
   expect(seen.efforts).toEqual(['high'])
-  expect(seen.statuses).toContain('effort high · 80%')
+  expect(seen.labels).toContain('effort high · 80%')
 })
 
 test("ordinary work on Nisev keeps the model's default", async ($, on) => {
@@ -283,7 +292,7 @@ test('the same answer means the default on a model whose default is high', async
   const seen = stub(on, { env: NISEV_ENV, fetch: nisevFetch(MULTI_STEP), model: 'claude-sonnet-5-5' })
   await runTurn($, 'Refactor the payment module and make the tests pass', { effort: 'high' })
   expect(seen.efforts).toEqual(['high'])
-  expect(seen.statuses).toContain('effort default · 90%')
+  expect(seen.labels).toContain('effort default · 90%')
 })
 
 test('when llama-server is not running, the mod starts it and the prompt keeps its effort', async ($, on) => {
@@ -326,6 +335,20 @@ test("Nisev's endpoint sets the port llama.cpp serves on", async ($, on) => {
   })
   await runTurn($, 'Refactor the parser')
   expect(spawned[0].slice(spawned[0].indexOf('--port'), spawned[0].indexOf('--port') + 2)).toEqual(['--port', '9000'])
+})
+
+test("a cloud endpoint's settings left in the environment don't start Nisev", async ($, on) => {
+  const spawned: string[][] = []
+  const env = { ...NISEV_ENV, AUTO_EFFORT_ENDPOINT: 'https://opencode.ai/zen/v1/systemone', AUTO_EFFORT_MODEL: 'jev-1.13' }
+  const seen = stub(on, { env, fetch: () => ({ deny: 'refused' }) })
+  on('process.spawn', async function* ($: any, e: any) {
+    spawned.push([...e.argv])
+    return { code: 0, signal: null }
+  })
+  await runTurn($, 'Refactor the parser')
+  expect(spawned).toEqual([])
+  expect(seen.efforts).toEqual(['medium']) // the session's own
+  expect(String(seen.statuses.at(-1))).toMatch(/AUTO_EFFORT_ENDPOINT is https:\/\/opencode.*AUTO_EFFORT_MODEL is jev-1\.13/)
 })
 
 // The wizard. The engine answers $.ui.ask through the AskUserQuestion tool.

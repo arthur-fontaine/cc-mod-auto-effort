@@ -252,15 +252,16 @@ ran through an in-process server; the llama.cpp row through `llama-server` b1140
 | Kev-4B, local (MLX) |  | 55.1% | 60.3% | 52.2% | 858 / 1527 ms |
 | Kev-4B GGUF Q8_0, local (ggmlc `laya`, Metal) |  | 52.9% | 58.1% | 51.5% | 3542 / 3893 ms |
 | Clef-flash 9B 4-bit, local (MLX) |  | 44.9% | 61.0% | 58.8% | 2177 / 3389 ms |
-| **Qwen3-1.7B fine-tuned, 8-bit** | 56.6% | 66.2% | 73.5% | 65.4% | 145 / 406 ms |
+| Qwen3-1.7B fine-tuned, 8-bit (MLX) | 56.6% | 66.2% | 73.5% | 65.4% | 145 / 406 ms |
+| **Qwen3-1.7B fine-tuned, GGUF Q8_0 (llama.cpp)** | 56.6% | 65.4% | 73.5% | 66.9% | 137 / 391 ms |
 | Qwen3.5-2B on Colab (Unsloth), attention + MLP adapters, 8-bit | 51.5% | 60.3% | 66.9% | 61.8% | 166 / 435 ms |
 | Qwen3.5-2B on Colab (Unsloth), all linear layers, 8-bit | 56.6% | 64.0% | 69.1% | 61.8% | 170 / 472 ms |
 | Sonnet 5.5 from the prompt alone (teacher) | 71.3% | 75.0% | | | |
 
-The fine-tuned Qwen3-1.7B, 1.8 GB at 8-bit, gets the level right on 66.2% of turns against
+Through MLX, the fine-tuned Qwen3-1.7B, 1.8 GB at 8-bit, gets the level right on 66.2% of turns against
 59.6% for Jev, and 73.5% against 69.9% as Opus 5.5. It moves effort in the right direction
 (raise, keep or lower) on 75.0% of turns against 72.1%, and is within one level on 97.1%
-against 91.9%. Through MLX it answers in 145 ms at the median and 406 ms at p95 (max 827 ms), against
+against 91.9%. It answers in 145 ms at the median and 406 ms at p95 (max 827 ms), against
 625 / 749 ms for Jev. Jev was asked through the mod's own request, model included. With
 n = 136 the accuracy gaps are a few points of standard error, so read them as "at least as
 good as Jev, locally, at a quarter of the latency" rather than as precise margins.

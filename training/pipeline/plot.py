@@ -16,8 +16,9 @@ W, H = 760, 470
 LEFT, RIGHT, TOP, BOTTOM = 72, 28, 56, 64
 X_MIN, X_MAX = 100, 4000  # ms, log scale
 Y_MIN, Y_MAX = 40, 80  # % right level
-# The zone to aim for: answers before a prompt visibly waits, and clearly above keeping the default.
-GOAL_MS, GOAL_PCT = 300, 60
+# The zone to aim for: under the Doherty threshold (people stay engaged when a system answers
+# within 400 ms; Doherty and Thadani, IBM, 1982), and clearly above keeping the default.
+GOAL_MS, GOAL_PCT = 400, 60
 DEFAULT_PCT = 52.9
 
 
@@ -34,7 +35,8 @@ def points():
         path = ROOT / "results" / f"bench-{name}.json"
         if path.exists():
             r = json.loads(path.read_text())
-            yield {"label": re.sub(r"\*\*|\s*\(.*?\)", "", label), "local": r["bench"]["where"] == "local",
+            where = r["bench"]["where"]
+            yield {"label": re.sub(r"\*\*|\s*\(.*?\)", "", label) + f" ({where})", "local": where == "local",
                    "pct": 100 * r["level_actual_model"]["accuracy"], **r["latency_ms"]}
 
 
@@ -63,6 +65,8 @@ def svg():
                'stroke-dasharray="4 3"/>')
     out.append(f'<text x="{LEFT + 10}" y="{TOP + 20}" class="goal" style="font-weight: 600">Where we want to be</text>')
     out.append(f'<text x="{LEFT + 10}" y="{TOP + 37}" class="goal" style="font-size: 12px">fast and accurate</text>')
+    out.append(f'<text x="{gx - 6:.1f}" y="{gy - 8:.1f}" class="goal" text-anchor="end" style="font-size: 11px">'
+               f'Doherty threshold, {GOAL_MS} ms</text>')
 
     for ms in (100, 200, 500, 1000, 2000):
         out.append(f'<line class="grid" x1="{x(ms):.1f}" x2="{x(ms):.1f}" y1="{TOP}" y2="{H - BOTTOM}"/>')

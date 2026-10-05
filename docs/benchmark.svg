@@ -14,9 +14,10 @@
   }
 </style>
 <rect class="bg" width="760" height="470"/>
-<rect x="72" y="56" width="196.6" height="175.0" class="zone" stroke-dasharray="4 3"/>
+<rect x="72" y="56" width="248.0" height="175.0" class="zone" stroke-dasharray="4 3"/>
 <text x="82" y="76" class="goal" style="font-weight: 600">Where we want to be</text>
 <text x="82" y="93" class="goal" style="font-size: 12px">fast and accurate</text>
+<text x="314.0" y="223.0" class="goal" text-anchor="end" style="font-size: 11px">Doherty threshold, 400 ms</text>
 <line class="grid" x1="72.0" x2="72.0" y1="56" y2="406"/>
 <text class="muted" x="72.0" y="424" text-anchor="middle">100 ms</text>
 <line class="grid" x1="196.0" x2="196.0" y1="56" y2="406"/>
@@ -41,19 +42,19 @@
 <text class="muted" x="726" y="309.1" text-anchor="end">always the model's default (52.9%)</text>
 <line x1="117.4" x2="303.1" y1="183.4" y2="183.4" class="local-tail" stroke-width="2" stroke-opacity="0.35"/>
 <circle class="local" cx="117.4" cy="183.4" r="6" stroke-width="2.5"/>
-<text x="117.4" y="171.4" text-anchor="middle" style="font-weight: 600">Nisev 1.7B</text>
+<text x="117.4" y="171.4" text-anchor="middle" style="font-weight: 600">Nisev 1.7B (local)</text>
 <line x1="584.1" x2="694.1" y1="273.5" y2="273.5" class="local-tail" stroke-width="2" stroke-opacity="0.35"/>
 <circle class="local" cx="584.1" cy="273.5" r="6" stroke-width="2.5"/>
-<text x="584.1" y="261.5" text-anchor="middle" style="font-weight: 600">Kev-4B</text>
+<text x="584.1" y="261.5" text-anchor="middle" style="font-weight: 600">Kev-4B (local)</text>
 <line x1="273.9" x2="467.0" y1="260.6" y2="260.6" class="cloud-tail" stroke-width="2" stroke-opacity="0.35"/>
 <circle class="cloud" cx="273.9" cy="260.6" r="6" stroke-width="2.5"/>
-<text x="273.9" y="248.6" text-anchor="middle" style="font-weight: 600">Clef-Flash 9B</text>
+<text x="273.9" y="248.6" text-anchor="middle" style="font-weight: 600">Clef-Flash 9B (cloud)</text>
 <line x1="358.0" x2="461.1" y1="305.6" y2="305.6" class="cloud-tail" stroke-width="2" stroke-opacity="0.35"/>
 <circle class="cloud" cx="358.0" cy="305.6" r="6" stroke-width="2.5"/>
-<text x="358.0" y="329.6" text-anchor="middle" style="font-weight: 600">Clef 27B</text>
+<text x="358.0" y="329.6" text-anchor="middle" style="font-weight: 600">Clef 27B (cloud)</text>
 <line x1="388.9" x2="437.3" y1="215.6" y2="215.6" class="cloud-tail" stroke-width="2" stroke-opacity="0.35"/>
 <circle class="cloud" cx="388.9" cy="215.6" r="6" stroke-width="2.5"/>
-<text x="388.9" y="203.6" text-anchor="middle" style="font-weight: 600">Jev 1.13</text>
+<text x="388.9" y="203.6" text-anchor="middle" style="font-weight: 600">Jev 1.13 (cloud)</text>
 <text x="72" y="26" style="font-size: 16px; font-weight: 600">Right effort level against latency</text>
 <text x="402" y="452" text-anchor="middle" class="muted">Latency per prompt: median, line to p95 (log scale)</text>
 <text transform="translate(18 231) rotate(-90)" text-anchor="middle" class="muted">Right level, 136 held-out turns</text>

@@ -194,8 +194,10 @@ took 3.4 s per prompt at the median, at 4-bit.
 
 ![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](docs/benchmark.svg)
 
-The green zone is where a picker should be: under 300 ms at the median, so the prompt
-doesn't visibly wait, and above 60%, clearly better than keeping the model's default.
+The green zone is where a picker should be: under 400 ms at the median, the
+[Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
+engaged with a system instead of waiting on it, and above 60%, clearly better than keeping
+the model's default.
 
 | Model | Where | Served by | Right level | Right level on Opus 5.5 | Right level applied | Latency p50 / p95 |
 | :- | :- | :- | -: | -: | -: | -: |

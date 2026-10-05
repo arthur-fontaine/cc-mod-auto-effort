@@ -42,8 +42,10 @@ sends it, one request at a time; cloud latency includes the round trip from the 
 
 ![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](benchmark.svg)
 
-The green zone is where a picker should be: under 300 ms at the median, so the prompt
-doesn't visibly wait, and above 60%, clearly better than keeping the model's default.
+The green zone is where a picker should be: under 400 ms at the median, the
+[Doherty threshold](https://lawsofux.com/doherty-threshold/) below which people stay
+engaged with a system instead of waiting on it, and above 60%, clearly better than keeping
+the model's default.
 
 {{benchmark}}
 

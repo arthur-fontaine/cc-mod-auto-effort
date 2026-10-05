@@ -68,13 +68,12 @@ across sessions.
 | Model | Runs | Right level | Latency, median | You need |
 | :- | :- | -: | -: | :- |
 | Nisev 1.7B | On your machine | 65.4% | 129 ms | llama.cpp, and a one-time 1.9 GB download |
-| Jev 1.13 | Cloud: OpenCode Zen, TypeSafe, OpenRouter, Vercel AI Gateway | 61.8% | 588 ms | A key for one of them |
-| Clef-Flash 9B, Clef 27B | Cloud: Cloudflare Workers AI | 56.6%, 51.5% | 309, 495 ms | A Workers AI token |
+| Jev 1.13 | Cloud | 61.8% | 588 ms | An API key from a provider that serves it |
+| Clef-Flash 9B, Clef 27B | Cloud | 56.6%, 51.5% | 309, 495 ms | An API key from a provider that serves it |
 
 "Right level" is how often the model picked the effort that two Claude teachers agreed on,
-over 136 real turns; always keeping the default gets 51.5%. Latency is from an M4 Pro, with
-Jev measured through OpenCode Zen; other providers will differ. Details in the
-[benchmark](#benchmark).
+over 136 real turns; always keeping the default gets 51.5%. Latency is from an M4 Pro; for
+cloud models it depends on the provider. Details in the [benchmark](#benchmark).
 
 ### Nisev (local)
 
@@ -91,8 +90,8 @@ Jev measured through OpenCode Zen; other providers will differ. Details in the
 ### A cloud model (Jev, Clef)
 
 Any provider that serves the System One API works. Setup has **OpenCode Zen** and
-**TypeSafe** built in; for the others, choose **Other** and enter the endpoint and model
-below. Then set the provider's key as `AUTO_EFFORT_API_KEY`
+**TypeSafe** built in; for any other, choose **Other** and enter its endpoint and model.
+Some that work: Then set the provider's key as `AUTO_EFFORT_API_KEY`
 ([where](#environment-variables)). The mod never stores it.
 
 | Provider | Endpoint | Model |
@@ -100,7 +99,6 @@ below. Then set the provider's key as `AUTO_EFFORT_API_KEY`
 | OpenCode Zen | `https://opencode.ai/zen/v1/systemone` | `jev-1.13` |
 | TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` |
 | OpenRouter | `https://openrouter.ai/api/v1/systemone` | `typesafe/jev-1.13` |
-| Vercel AI Gateway | `https://ai-gateway.vercel.sh/typesafe/v1/systemone` | `typesafe-ai/jev` |
 | Cloudflare Workers AI | see below | `clef` or `clef-flash` |
 
 For Cloudflare, use this URL, with `clef` or `clef-flash` at the end, and a token made from

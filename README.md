@@ -216,9 +216,6 @@ It leaves the session's own effort alone when:
 - the provider times out or errors, or Nisev is still starting;
 - no provider is set up, the model takes no effort, or the request comes from a subagent.
 
-Each prompt waits for the answer before its turn starts: about 130 ms with Nisev on an M4
-Pro, 600 ms with Jev through OpenCode Zen, and never more than `AUTO_EFFORT_TIMEOUT_MS`.
-
 ## Benchmark
 
 ![Right effort level against median latency, one point per model. Nisev is the only one in the fast and accurate zone.](docs/benchmark.svg)
